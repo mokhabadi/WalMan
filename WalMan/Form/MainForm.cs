@@ -14,7 +14,7 @@ namespace WalMan
             InitializeComponent();
         }
 
-        void Form1_Load(object sender, EventArgs e)
+        void MainFormLoad(object sender, EventArgs e)
         {
             intervalComboBox.Items.AddRange(Manager.TimeIntervals);
 

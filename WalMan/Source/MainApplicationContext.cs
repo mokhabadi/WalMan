@@ -34,15 +34,11 @@ namespace WalMan
             Manager.Load();
         }
 
-        int counter;
-
         async void NotifyIconBalloonTipShown(object? sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(counter++);
             notifyIcon.MouseMove -= NotifyIconBalloonTipShown;
             await Task.Delay(500);
             notifyIcon.MouseMove += NotifyIconBalloonTipShown;
-            notifyIcon.Text = counter.ToString();
         }
 
         void NotifyIconMouseUp(object? sender, MouseEventArgs e)
