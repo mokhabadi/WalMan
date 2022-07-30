@@ -2,32 +2,22 @@
 {
     internal class AsyncTimer
     {
-        DateTimeOffset startTime;
-        CancellationTokenSource cancellationTokenSource = new();
+        readonly DateTimeOffset startTime;
 
         public int ElapsedTime => (DateTimeOffset.UtcNow - startTime).Seconds;
 
-        public event Func<Task>? Elapsed;
+        public event Action? Elapsed;
 
-        public async void Start(int timeInterval)
+        public AsyncTimer(int timeInterval)
         {
             startTime = DateTimeOffset.UtcNow;
-
-            try
-            {
-                await Task.Delay(TimeSpan.FromSeconds(timeInterval), cancellationTokenSource.Token);
-                Elapsed?.Invoke();
-            }
-            catch
-            {
-                cancellationTokenSource.Dispose();
-                cancellationTokenSource = new CancellationTokenSource();
-            }
+            Start(timeInterval);
         }
 
-        public void Stop()
+        async void Start(int timeInterval)
         {
-            cancellationTokenSource.Cancel();
+            await Task.Delay(TimeSpan.FromSeconds(timeInterval));
+            Elapsed?.Invoke();
         }
     }
 }

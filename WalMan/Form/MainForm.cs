@@ -6,8 +6,8 @@ namespace WalMan
     {
         public event Action<string>? WallpaperFolderChanged;
         public event Action<string>? IntervalChanged;
-
-        static Settings Settings => Settings.Default;
+        public event Action? Loaded;
+        public event Action? DisableClicked;
 
         public MainForm()
         {
@@ -17,12 +17,13 @@ namespace WalMan
         void MainFormLoad(object sender, EventArgs e)
         {
             intervalComboBox.Items.AddRange(Manager.TimeIntervals);
+            Loaded?.Invoke();
+        }
 
-            foreach (string intervalName in Manager.TimeIntervals)
-                if (Manager.timeIntervalDictionary[intervalName] == Settings.timerInterval)
-                    intervalComboBox.SelectedValue = intervalName;
-
-            wallpaperFolderLabel.Text = Settings.wallpaperFolder != "" ? Settings.wallpaperFolder : "not set";
+        public void Initialize(string wallpaperFolder,string? currentInterval)
+        {
+            wallpaperFolderLabel.Text = wallpaperFolder != "" ? wallpaperFolder : "not set";
+            intervalComboBox.Text = currentInterval;
         }
 
         void SelectFolderButtonClick(object sender, EventArgs e)
@@ -42,7 +43,7 @@ namespace WalMan
 
         void UnregisterButtonClick(object sender, EventArgs e)
         {
-
+            DisableClicked?.Invoke();
         }
     }
 }

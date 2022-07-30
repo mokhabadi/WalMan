@@ -54,6 +54,7 @@
             // 
             // intervalComboBox
             // 
+            this.intervalComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.intervalComboBox.FormattingEnabled = true;
             this.intervalComboBox.Location = new System.Drawing.Point(15, 155);
             this.intervalComboBox.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);

@@ -52,7 +52,7 @@ namespace WalMan
             RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShell, true);
 
             if (key?.OpenSubKey(applicationName) != null)
-                key.DeleteSubKey(applicationName);
+                key.DeleteSubKeyTree(applicationName);
         }
 
         static void StartUp(bool enable)
