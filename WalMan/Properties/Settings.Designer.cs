@@ -8,95 +8,76 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WalMan.Properties
-{
-
-
+namespace WalMan.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.2.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
-        public int timerInterval
-        {
-            get
-            {
+        public int timerInterval {
+            get {
                 return ((int)(this["timerInterval"]));
             }
-            set
-            {
+            set {
                 this["timerInterval"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int elapsedTime
-        {
-            get
-            {
-                return ((int)(this["elapsedTime"]));
+        public int remainingTime {
+            get {
+                return ((int)(this["remainingTime"]));
             }
-            set
-            {
-                this["elapsedTime"] = value;
+            set {
+                this["remainingTime"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string wallpaperFolder
-        {
-            get
-            {
+        public string wallpaperFolder {
+            get {
                 return ((string)(this["wallpaperFolder"]));
             }
-            set
-            {
+            set {
                 this["wallpaperFolder"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string currentWallpaper
-        {
-            get
-            {
+        public string currentWallpaper {
+            get {
                 return ((string)(this["currentWallpaper"]));
             }
-            set
-            {
+            set {
                 this["currentWallpaper"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public string[] skips
-        {
-            get
-            {
+        public string[] skips {
+            get {
                 return ((string[])(this["skips"]));
             }
-            set
-            {
+            set {
                 this["skips"] = value;
             }
         }

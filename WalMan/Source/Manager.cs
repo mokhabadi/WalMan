@@ -9,6 +9,7 @@ namespace WalMan
         static AsyncTimer? asyncTimer;
         static List<string> filePathList = new();
         static Dictionary<string, Command>? commandDictionary;
+        static readonly MainForm mainForm = new();
 
         static Settings Settings => Settings.Default;
         static string WallpaperPath => Application.StartupPath + "Wallpaper.bmp";
@@ -34,28 +35,35 @@ namespace WalMan
 
         public static void Load()
         {
+            Log.Add("<-------------------------------------Load------------------------------------->");
             WindowsRegistry.EnableFeatures();
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
             Application.ApplicationExit += ApplicationExit;
+            mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
+            mainForm.IntervalChanged += IntervalChanged;
+            mainForm.Loaded += MainFormLoaded;
+            mainForm.DisableClicked += MainFormDisableClicked;
 
             if (Settings.skips == null)
                 Settings.skips = Array.Empty<string>();
 
             if (Settings.currentWallpaper != "")
-                StartTimer(Settings.timerInterval - Settings.elapsedTime);
+                StartTimer(Settings.remainingTime);
             else if (Settings.wallpaperFolder != "")
                 ChangeWallpaperFolder(Settings.wallpaperFolder);
         }
 
         public static void StartTimer(int timerInterval)
         {
-            asyncTimer = new AsyncTimer(timerInterval);
-            asyncTimer.Elapsed += () => ExecuteCommand(nameof(Next));
+            Log.Add("StartTimer: " + timerInterval);
+            asyncTimer = new AsyncTimer(timerInterval, () => ExecuteCommand(nameof(Next)));
         }
 
         public static void ExecuteCommand(string commandName)
         {
+            Log.Add("ExecuteCommand: " + commandName);
+
             if (commandTask?.IsCompleted == false)
                 return;
 
@@ -88,13 +96,15 @@ namespace WalMan
 
         public static void ChangeWallpaperFolder(string wallpaperFolder)
         {
+            Log.Add("ChangeWallpaperFolder: " + wallpaperFolder);
             Settings.wallpaperFolder = wallpaperFolder;
-            Settings.elapsedTime = 0;
+            Settings.remainingTime = 0;
             ExecuteCommand(nameof(Next));
         }
 
         public static void IntervalChanged(string intervalName)
         {
+            Log.Add("IntervalChanged: " + intervalName);
             Settings.timerInterval = timeIntervalDictionary[intervalName];
         }
 
@@ -116,7 +126,7 @@ namespace WalMan
             Stream? stream = await WalCreator.Create(Settings.currentWallpaper);
 
             if (stream != null)
-                await SetWallpaper(stream);
+                await SetDesktopBackground(stream);
         }
 
         static async Task Next()
@@ -157,7 +167,7 @@ namespace WalMan
 
                 if (stream != null)
                 {
-                    await SetWallpaper(stream);
+                    await SetDesktopBackground(stream);
                     Settings.currentWallpaper = filePathList[wallpaperIndex];
                     Settings.Save();
                     return true;
@@ -165,7 +175,7 @@ namespace WalMan
             }
         }
 
-        static async Task SetWallpaper(Stream stream)
+        static async Task SetDesktopBackground(Stream stream)
         {
             FileStream fileStream = new(WallpaperPath, FileMode.Create, FileAccess.ReadWrite);
             await stream.CopyToAsync(fileStream);
@@ -218,28 +228,26 @@ namespace WalMan
 
         static void ApplicationExit(object? sender, EventArgs e)
         {
+            Settings.remainingTime = 0;
+
             if (asyncTimer != null)
-                Settings.elapsedTime = asyncTimer.ElapsedTime;
-        }
-        static MainForm mainForm;
-        public static void Open()
-        {
-            mainForm = new();
-            mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
-            mainForm.IntervalChanged += IntervalChanged;
-            mainForm.Loaded += MainFormLoaded;
-            mainForm.DisableClicked += MainFormDisableClicked;
-            mainForm.ShowDialog();
+                Settings.remainingTime = asyncTimer.RemainingTime;
         }
 
-        private static void MainFormDisableClicked()
+        public static void Open()
         {
-            WindowsRegistry.DisableFeatures();
+            mainForm.ShowDialog();
         }
 
         static void MainFormLoaded()
         {
-            mainForm.Initialize(Settings.wallpaperFolder,CurrentInterval());
+            mainForm.Initialize(Settings.wallpaperFolder, CurrentInterval(), Settings.skips);
+        }
+
+        static void MainFormDisableClicked()
+        {
+            WindowsRegistry.DisableFeatures();
+            Settings.Reset();
         }
 
         static string? CurrentInterval()
@@ -249,6 +257,29 @@ namespace WalMan
                     return intervalName;
 
             return null;
+        }
+
+        public static string GetRemaining()
+        {
+            if (asyncTimer != null)
+                return SecondToString(asyncTimer.RemainingTime);
+
+            return "Disabled";
+        }
+
+        static string SecondToString(int seconds)
+        {
+            if (seconds < 120)
+                return seconds.ToString() + " Seconds";
+
+            int minutes = seconds / 60;
+
+            if (minutes < 120)
+                return minutes.ToString() + " Minutes";
+
+            int hours = minutes / 60;
+
+            return hours.ToString() + " Hours";
         }
     }
 }

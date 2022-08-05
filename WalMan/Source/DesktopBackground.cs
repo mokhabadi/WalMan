@@ -42,7 +42,7 @@ namespace WalMan
             key.SetValue(@"WallpaperStyle", styles[style].Style.ToString());
             key.SetValue(@"TileWallpaper", styles[style].Tile.ToString());
             int result = await Task.Run(() => SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, filePath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE));
-            await Log.Add("Wallpaper Set " + (result > 0 ? "Successfully" : "failed"));
+            Log.Add("Wallpaper Set " + (result > 0 ? "Successfully" : "failed"));
         }
     }
 }

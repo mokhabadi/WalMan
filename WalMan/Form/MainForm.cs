@@ -1,6 +1,4 @@
-﻿using WalMan.Properties;
-
-namespace WalMan
+﻿namespace WalMan
 {
     internal partial class MainForm : Form
     {
@@ -20,10 +18,11 @@ namespace WalMan
             Loaded?.Invoke();
         }
 
-        public void Initialize(string wallpaperFolder,string? currentInterval)
+        public void Initialize(string wallpaperFolder,string? currentInterval, string[] skips)
         {
             wallpaperFolderLabel.Text = wallpaperFolder != "" ? wallpaperFolder : "not set";
             intervalComboBox.Text = currentInterval;
+            skipListBox.Items.AddRange(skips);
         }
 
         void SelectFolderButtonClick(object sender, EventArgs e)

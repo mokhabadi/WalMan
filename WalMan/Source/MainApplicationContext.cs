@@ -28,17 +28,18 @@ namespace WalMan
                 Text = "Disable",
             };
 
-            notifyIcon.MouseMove += NotifyIconBalloonTipShown;
+            notifyIcon.MouseMove += NotifyIconMouseMove;
             notifyIcon.MouseUp += NotifyIconMouseUp;
             Application.ApplicationExit += (sender, eventArgs) => notifyIcon.Visible = false;
             Manager.Load();
         }
 
-        async void NotifyIconBalloonTipShown(object? sender, EventArgs e)
+        async void NotifyIconMouseMove(object? sender, EventArgs e)
         {
-            notifyIcon.MouseMove -= NotifyIconBalloonTipShown;
+            notifyIcon.MouseMove -= NotifyIconMouseMove;
+            notifyIcon.Text = Manager.GetRemaining();
             await Task.Delay(500);
-            notifyIcon.MouseMove += NotifyIconBalloonTipShown;
+            notifyIcon.MouseMove += NotifyIconMouseMove;
         }
 
         void NotifyIconMouseUp(object? sender, MouseEventArgs e)

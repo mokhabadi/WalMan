@@ -3,13 +3,16 @@
     internal class AsyncTimer
     {
         readonly DateTimeOffset startTime;
+        readonly int timeInterval;
 
-        public int ElapsedTime => (DateTimeOffset.UtcNow - startTime).Seconds;
+        public int RemainingTime => timeInterval - (DateTimeOffset.UtcNow - startTime).Seconds;
 
-        public event Action? Elapsed;
+        public Action Elapsed;
 
-        public AsyncTimer(int timeInterval)
+        public AsyncTimer(int timeInterval, Action Elapsed)
         {
+            this.timeInterval = timeInterval;
+            this.Elapsed = Elapsed;
             startTime = DateTimeOffset.UtcNow;
             Start(timeInterval);
         }
@@ -17,7 +20,7 @@
         async void Start(int timeInterval)
         {
             await Task.Delay(TimeSpan.FromSeconds(timeInterval));
-            Elapsed?.Invoke();
+            Elapsed();
         }
     }
 }
