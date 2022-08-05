@@ -5,7 +5,7 @@
         readonly DateTimeOffset startTime;
         readonly int timeInterval;
 
-        public int RemainingTime => timeInterval - (DateTimeOffset.UtcNow - startTime).Seconds;
+        public int RemainingTime => (int)(timeInterval - (DateTimeOffset.UtcNow - startTime).TotalSeconds);
 
         public Action Elapsed;
 
