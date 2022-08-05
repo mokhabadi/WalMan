@@ -35,7 +35,7 @@ namespace WalMan
             RegistryKey rootRegistryKey = key.CreateSubKey("shell");
             int index = 1;
 
-            foreach (Command command in Manager.commandList)
+            foreach (Command command in Manager.Commands)
             {
                 key = rootRegistryKey.CreateSubKey(index.ToString() + "- " + command);
                 key.SetValue(null, command.Description);

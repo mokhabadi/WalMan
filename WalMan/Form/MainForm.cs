@@ -3,7 +3,7 @@
     internal partial class MainForm : Form
     {
         public event Action<string>? WallpaperFolderChanged;
-        public event Action<string>? IntervalChanged;
+        public event Action<int>? IntervalChanged;
         public event Action? Loaded;
         public event Action? DisableClicked;
 
@@ -14,14 +14,16 @@
 
         void MainFormLoad(object sender, EventArgs e)
         {
-            intervalComboBox.Items.AddRange(Manager.TimeIntervals);
+            foreach (int timeInterval in Manager.timeIntervals)
+                intervalComboBox.Items.Add(Manager.SecondToString(timeInterval));
+
             Loaded?.Invoke();
         }
 
-        public void Initialize(string wallpaperFolder,string? currentInterval, string[] skips)
+        public void Initialize(string wallpaperFolder, int currentInterval, string[] skips)
         {
             wallpaperFolderLabel.Text = wallpaperFolder != "" ? wallpaperFolder : "not set";
-            intervalComboBox.Text = currentInterval;
+            intervalComboBox.SelectedIndex = currentInterval;
             skipListBox.Items.AddRange(skips);
         }
 
@@ -36,8 +38,7 @@
 
         void IntervalComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
-            string selectedInterval = (string)intervalComboBox.SelectedItem;
-            IntervalChanged?.Invoke(selectedInterval);
+            IntervalChanged?.Invoke(intervalComboBox.SelectedIndex);
         }
 
         void UnregisterButtonClick(object sender, EventArgs e)

@@ -10,12 +10,13 @@ namespace WalMan
         static List<string> filePathList = new();
         static Dictionary<string, Command>? commandDictionary;
         static readonly MainForm mainForm = new();
+        public static readonly int[] timeIntervals = { 10, 30, 60, 180, 600, 1800, 3600, 7200, 10800 };
 
         static Settings Settings => Settings.Default;
         static string WallpaperPath => Application.StartupPath + "Wallpaper.bmp";
-        public static string[] TimeIntervals => timeIntervalDictionary.Keys.ToArray();
+        public static Command[] Commands => commandList.ToArray();
 
-        public static readonly List<Command> commandList = new()
+        static readonly List<Command> commandList = new()
         {
             new Command(Reload),
             new Command(Next),
@@ -23,14 +24,6 @@ namespace WalMan
             new Command(Delete),
             new Command(MarkAsMasterpiece, "Mark as Masterpiece"),
             new Command(ShowInExplorer, "Show in Explorer"),
-        };
-
-        public static readonly Dictionary<string, int> timeIntervalDictionary = new()
-        {
-            { "10 seconds", 10 },
-            { "1 hour", 3600 },
-            { "2 hour", 7200 },
-            { "3 hour", 10800 },
         };
 
         public static void Load()
@@ -102,10 +95,10 @@ namespace WalMan
             ExecuteCommand(nameof(Next));
         }
 
-        public static void IntervalChanged(string intervalName)
+        public static void IntervalChanged(int timerInterval)
         {
-            Log.Add("IntervalChanged: " + intervalName);
-            Settings.timerInterval = timeIntervalDictionary[intervalName];
+            Log.Add("IntervalChanged: " + timerInterval);
+            Settings.timerInterval = timerInterval;
         }
 
         static async Task UpdateFilePathList()
@@ -139,7 +132,7 @@ namespace WalMan
             bool result = await SetWallpaper(wallpaperIndex);
 
             if (result == true)
-                StartTimer(Settings.timerInterval);
+                StartTimer(timeIntervals[Settings.timerInterval]);
         }
 
         static async Task<bool> SetWallpaper(int wallpaperIndex)
@@ -241,22 +234,13 @@ namespace WalMan
 
         static void MainFormLoaded()
         {
-            mainForm.Initialize(Settings.wallpaperFolder, CurrentInterval(), Settings.skips);
+            mainForm.Initialize(Settings.wallpaperFolder, Settings.timerInterval, Settings.skips);
         }
 
         static void MainFormDisableClicked()
         {
             WindowsRegistry.DisableFeatures();
             Settings.Reset();
-        }
-
-        static string? CurrentInterval()
-        {
-            foreach (string intervalName in TimeIntervals)
-                if (timeIntervalDictionary[intervalName] == Settings.timerInterval)
-                    return intervalName;
-
-            return null;
         }
 
         public static string GetRemaining()
@@ -267,7 +251,7 @@ namespace WalMan
             return "Disabled";
         }
 
-        static string SecondToString(int seconds)
+        public static string SecondToString(int seconds)
         {
             if (seconds < 120)
                 return $"{seconds} Seconds";

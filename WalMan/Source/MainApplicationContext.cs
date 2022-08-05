@@ -11,7 +11,7 @@ namespace WalMan
         {
             List<ToolStripItem> toolStripItems = new();
 
-            foreach (Command command in Manager.commandList)
+            foreach (Command command in Manager.Commands)
                 toolStripItems.Add(new ToolStripMenuItem(command.Description, null, (sender, eventArgs) => command.Action()));
 
             toolStripItems.Add(new ToolStripSeparator());
