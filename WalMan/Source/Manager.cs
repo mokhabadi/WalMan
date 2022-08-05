@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using WalMan.Properties;
 
 namespace WalMan
@@ -106,8 +107,8 @@ namespace WalMan
             await Task.Run(() =>
             {
                 string[] filePaths = Directory.GetFiles(Settings.wallpaperFolder);
-                filePathList = new List<string>(filePaths);
-                filePathList.Sort();
+                filePathList = new(filePaths);
+                filePathList.Sort((x, y) => StrCmpLogicalW(x, y));
             });
         }
 
@@ -265,5 +266,9 @@ namespace WalMan
 
             return $"{hours} Hours {minutes % 60} Minutes";
         }
+
+        [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        static extern int StrCmpLogicalW(string x, string y);
+
     }
 }
