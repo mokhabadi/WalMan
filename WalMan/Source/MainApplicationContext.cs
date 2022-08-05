@@ -22,7 +22,7 @@ namespace WalMan
 
             notifyIcon = new NotifyIcon()
             {
-                Icon = Resources.notifyIcon,
+                Icon = Resources.WalMan,
                 ContextMenuStrip = contextMenuStrip,
                 Visible = true,
                 Text = "Disable",

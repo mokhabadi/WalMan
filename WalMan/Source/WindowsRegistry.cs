@@ -31,7 +31,7 @@ namespace WalMan
 
             key = key.CreateSubKey(applicationName);
             key.SetValue("SubCommands", "");
-            key.SetValue("Icon", @"%WinDir%\system32\imageres.dll,-110", RegistryValueKind.ExpandString);
+            key.SetValue("Icon", Application.ExecutablePath.Enquote(), RegistryValueKind.ExpandString);
             RegistryKey rootRegistryKey = key.CreateSubKey("shell");
             int index = 1;
 

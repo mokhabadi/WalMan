@@ -63,9 +63,9 @@ namespace WalMan.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon notifyIcon {
+        internal static System.Drawing.Icon WalMan {
             get {
-                object obj = ResourceManager.GetObject("notifyIcon", resourceCulture);
+                object obj = ResourceManager.GetObject("WalMan", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }
