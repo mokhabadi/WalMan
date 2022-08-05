@@ -270,16 +270,16 @@ namespace WalMan
         static string SecondToString(int seconds)
         {
             if (seconds < 120)
-                return seconds.ToString() + " Seconds";
+                return $"{seconds} Seconds";
 
             int minutes = seconds / 60;
 
             if (minutes < 120)
-                return minutes.ToString() + " Minutes";
+                return $"{minutes} Minutes";
 
             int hours = minutes / 60;
 
-            return hours.ToString() + " Hours";
+            return $"{hours} Hours {minutes % 60} Minutes";
         }
     }
 }
