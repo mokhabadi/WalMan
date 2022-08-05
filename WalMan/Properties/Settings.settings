@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="timerInterval" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="remainingTime" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>

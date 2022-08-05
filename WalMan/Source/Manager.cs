@@ -37,7 +37,7 @@ namespace WalMan
             mainForm.IntervalChanged += IntervalChanged;
             mainForm.Loaded += MainFormLoaded;
             mainForm.DisableClicked += MainFormDisableClicked;
-            Settings.timerInterval = 0;
+
             if (Settings.skips == null)
                 Settings.skips = Array.Empty<string>();
 
