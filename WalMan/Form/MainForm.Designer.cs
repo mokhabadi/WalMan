@@ -37,6 +37,7 @@
             this.unregisterButton = new System.Windows.Forms.Button();
             this.skipListBox = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.openLogButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // selectFolderButton
@@ -125,11 +126,23 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "Skip list:";
             // 
+            // openLogButton
+            // 
+            this.openLogButton.Location = new System.Drawing.Point(12, 198);
+            this.openLogButton.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.openLogButton.Name = "openLogButton";
+            this.openLogButton.Size = new System.Drawing.Size(128, 38);
+            this.openLogButton.TabIndex = 10;
+            this.openLogButton.Text = "Open Log";
+            this.openLogButton.UseVisualStyleBackColor = true;
+            this.openLogButton.Click += new System.EventHandler(this.OpenLogButtonClick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(382, 353);
+            this.Controls.Add(this.openLogButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.skipListBox);
             this.Controls.Add(this.unregisterButton);
@@ -162,6 +175,7 @@
         private System.Windows.Forms.Button unregisterButton;
         private ListBox skipListBox;
         private Label label3;
+        private Button openLogButton;
     }
 }
 

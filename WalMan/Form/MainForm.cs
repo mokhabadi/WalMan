@@ -1,4 +1,6 @@
-﻿namespace WalMan
+﻿using System.Diagnostics;
+
+namespace WalMan
 {
     internal partial class MainForm : Form
     {
@@ -14,8 +16,9 @@
 
         void MainFormLoad(object sender, EventArgs e)
         {
-            foreach (int timeInterval in Manager.timeIntervals)
-                intervalComboBox.Items.Add(Manager.SecondToString(timeInterval));
+            if (intervalComboBox.Items.Count == 0)
+                foreach (int timeInterval in Manager.timeIntervals)
+                    intervalComboBox.Items.Add(Manager.SecondToString(timeInterval));
 
             Loaded?.Invoke();
         }
@@ -44,6 +47,12 @@
         void UnregisterButtonClick(object sender, EventArgs e)
         {
             DisableClicked?.Invoke();
+        }
+
+        void OpenLogButtonClick(object sender, EventArgs e)
+        {
+            string filePath = Application.StartupPath + "Log.txt";
+            Process.Start("notepad.exe", filePath);
         }
     }
 }
