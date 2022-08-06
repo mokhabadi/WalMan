@@ -7,7 +7,7 @@
 
         public int RemainingTime => (int)(timeInterval - (DateTimeOffset.UtcNow - startTime).TotalSeconds);
 
-        public Action Elapsed;
+        public Action? Elapsed;
 
         public AsyncTimer(int timeInterval, Action Elapsed)
         {
@@ -20,7 +20,12 @@
         async void Start(int timeInterval)
         {
             await Task.Delay(TimeSpan.FromSeconds(timeInterval));
-            Elapsed();
+            Elapsed?.Invoke();
+        }
+
+        public void Stop()
+        {
+            Elapsed = null;
         }
     }
 }

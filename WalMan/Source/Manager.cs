@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.VisualBasic.FileIO;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using WalMan.Properties;
 
@@ -51,6 +52,7 @@ namespace WalMan
         public static void StartTimer(int timerInterval)
         {
             Log.Add("StartTimer: " + timerInterval);
+            asyncTimer?.Stop();
             asyncTimer = new AsyncTimer(timerInterval, () => ExecuteCommand(nameof(Next)));
         }
 
@@ -193,7 +195,7 @@ namespace WalMan
 
             string fileToDelete = Settings.currentWallpaper;
             await Next();
-            await Task.Run(() => File.Delete(fileToDelete));
+            await Task.Run(() => FileSystem.DeleteFile(fileToDelete, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin));
         }
 
         static async Task MarkAsMasterpiece()
