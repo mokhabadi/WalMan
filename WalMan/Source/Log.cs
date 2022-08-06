@@ -1,11 +1,13 @@
 ﻿using System.Text;
+using static System.Environment;
 
 namespace WalMan
 {
     internal static class Log
     {
-        static System.Collections.Concurrent.ConcurrentQueue<string> queue = new();
+        static readonly System.Collections.Concurrent.ConcurrentQueue<string> queue = new();
         static Task task = Task.CompletedTask;
+        public static readonly string filePath = $"{GetFolderPath(SpecialFolder.LocalApplicationData)}\\{Application.ProductName}\\Log.txt";
 
         public static void Add(string message)
         {
@@ -19,7 +21,6 @@ namespace WalMan
 
         public static async Task Save()
         {
-            string filePath = Application.StartupPath + "Log.txt";
             StringBuilder stringBuilder = new();
 
             while (queue.TryDequeue(out string? nextMessage))

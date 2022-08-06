@@ -51,8 +51,7 @@ namespace WalMan
 
         void OpenLogButtonClick(object sender, EventArgs e)
         {
-            string filePath = Application.StartupPath + "Log.txt";
-            Process.Start("notepad.exe", filePath);
+            Process.Start("notepad.exe", Log.filePath);
         }
     }
 }

@@ -26,12 +26,12 @@ namespace WalMan.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int timerInterval {
+        public int intervalIndex {
             get {
-                return ((int)(this["timerInterval"]));
+                return ((int)(this["intervalIndex"]));
             }
             set {
-                this["timerInterval"] = value;
+                this["intervalIndex"] = value;
             }
         }
         

@@ -96,10 +96,10 @@ namespace WalMan
             ExecuteCommand(nameof(Next));
         }
 
-        public static void IntervalChanged(int timerInterval)
+        public static void IntervalChanged(int intervalIndex)
         {
-            Log.Add("IntervalChanged: " + timerInterval);
-            Settings.timerInterval = timerInterval;
+            Log.Add("IntervalChanged: " + intervalIndex);
+            Settings.intervalIndex = intervalIndex;
         }
 
         static async Task UpdateFilePathList()
@@ -133,7 +133,7 @@ namespace WalMan
             bool result = await SetWallpaper(wallpaperIndex);
 
             if (result == true)
-                StartTimer(timeIntervals[Settings.timerInterval]);
+                StartTimer(timeIntervals[Settings.intervalIndex]);
         }
 
         static async Task<bool> SetWallpaper(int wallpaperIndex)
@@ -235,7 +235,7 @@ namespace WalMan
 
         static void MainFormLoaded()
         {
-            mainForm.Initialize(Settings.wallpaperFolder, Settings.timerInterval, Settings.skips);
+            mainForm.Initialize(Settings.wallpaperFolder, Settings.intervalIndex, Settings.skips);
         }
 
         static void MainFormDisableClicked()

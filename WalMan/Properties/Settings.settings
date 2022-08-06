@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WalMan.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="timerInterval" Type="System.Int32" Scope="User">
+    <Setting Name="intervalIndex" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="remainingTime" Type="System.Int32" Scope="User">
