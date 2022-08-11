@@ -9,6 +9,7 @@ namespace WalMan
 
         public MainApplicationContext()
         {
+            Log.Add(@"/+++++ Application Run +++++\");
             List<ToolStripItem> toolStripItems = new();
 
             foreach (Command command in Manager.Commands)

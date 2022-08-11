@@ -30,11 +30,10 @@ namespace WalMan
 
         public static void Load()
         {
-            Log.Add("<-------------------------------------Load------------------------------------->");
             WindowsRegistry.EnableFeatures();
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
-            Application.ApplicationExit += ApplicationExit;
+            AppDomain.CurrentDomain.ProcessExit += ApplicationExit;
             mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
             mainForm.IntervalChanged += IntervalChanged;
             mainForm.Loaded += MainFormLoaded;
@@ -225,7 +224,7 @@ namespace WalMan
         static void ApplicationExit(object? sender, EventArgs e)
         {
             Settings.remainingTime = asyncTimer == null ? 0 : asyncTimer.RemainingTime;
-            Log.Add("ApplicationExit");
+            Log.Add(@"\----- ApplicationExit -----/");
             Log.Wait();
         }
 
