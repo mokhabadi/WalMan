@@ -9,6 +9,11 @@ namespace WalMan
         static Task task = Task.CompletedTask;
         public static readonly string filePath = $"{GetFolderPath(SpecialFolder.LocalApplicationData)}\\{Application.ProductName}\\Log.txt";
 
+        public static void Wait()
+        {
+            task.Wait();
+        }
+
         public static void Add(string message)
         {
             DateTime dateTime = DateTime.Now;

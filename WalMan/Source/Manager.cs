@@ -224,10 +224,9 @@ namespace WalMan
 
         static void ApplicationExit(object? sender, EventArgs e)
         {
-            Settings.remainingTime = 0;
-
-            if (asyncTimer != null)
-                Settings.remainingTime = asyncTimer.RemainingTime;
+            Settings.remainingTime = asyncTimer == null ? 0 : asyncTimer.RemainingTime;
+            Log.Add("ApplicationExit");
+            Log.Wait();
         }
 
         public static void Open()

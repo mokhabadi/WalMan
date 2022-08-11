@@ -5,7 +5,7 @@
         public Settings()
         {
             PropertyChanged += (sender,eventArgs) => Save();
-            PropertyChanged += (sender,eventArgs) => Log.Add($"Property {eventArgs.PropertyName} saved");            
+            PropertyChanged += (sender,eventArgs) => Log.Add($"Settings saved: {eventArgs.PropertyName} = {this[eventArgs.PropertyName]}");            
         }
     }
 }
