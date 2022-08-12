@@ -106,6 +106,9 @@ namespace WalMan
 
         public static void IntervalChanged(int intervalIndex)
         {
+            if (Settings.intervalIndex == intervalIndex)
+                return;
+
             Log.Add("IntervalChanged: " + intervalIndex);
             Settings.intervalIndex = intervalIndex;
         }
