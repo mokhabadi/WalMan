@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
+using Microsoft.Win32;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using WalMan.Properties;
@@ -33,7 +34,8 @@ namespace WalMan
             WindowsRegistry.EnableFeatures();
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
-            AppDomain.CurrentDomain.ProcessExit += ApplicationExit;
+            Application.ApplicationExit += ApplicationExit;
+            SystemEvents.SessionEnding += SystemEventsSessionEnding;
             mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
             mainForm.IntervalChanged += IntervalChanged;
             mainForm.Loaded += MainFormLoaded;
@@ -46,6 +48,11 @@ namespace WalMan
                 StartTimer(Settings.remainingTime);
             else if (Settings.wallpaperFolder != "")
                 ChangeWallpaperFolder(Settings.wallpaperFolder);
+        }
+
+        static void SystemEventsSessionEnding(object sender, SessionEndingEventArgs e)
+        {
+            Application.Exit();
         }
 
         public static void StartTimer(int timerInterval)
@@ -218,7 +225,7 @@ namespace WalMan
             if (File.Exists(Settings.currentWallpaper) == false)
                 return;
 
-            await Task.Run(() => Process.Start("explorer.exe", "/select,\"" + Settings.currentWallpaper + "\""));
+            await Task.Run(() => Process.Start("explorer.exe", $"/select,\"{Settings.currentWallpaper}\""));
         }
 
         static void ApplicationExit(object? sender, EventArgs e)

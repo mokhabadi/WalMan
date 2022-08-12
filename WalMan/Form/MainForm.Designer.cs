@@ -87,7 +87,7 @@
             // wallpaperFolderLabel
             // 
             this.wallpaperFolderLabel.AutoSize = true;
-            this.wallpaperFolderLabel.Location = new System.Drawing.Point(119, 9);
+            this.wallpaperFolderLabel.Location = new System.Drawing.Point(105, 9);
             this.wallpaperFolderLabel.Name = "wallpaperFolderLabel";
             this.wallpaperFolderLabel.Size = new System.Drawing.Size(52, 25);
             this.wallpaperFolderLabel.TabIndex = 6;
@@ -114,7 +114,7 @@
             this.skipListBox.ItemHeight = 25;
             this.skipListBox.Location = new System.Drawing.Point(146, 67);
             this.skipListBox.Name = "skipListBox";
-            this.skipListBox.Size = new System.Drawing.Size(224, 274);
+            this.skipListBox.Size = new System.Drawing.Size(324, 374);
             this.skipListBox.TabIndex = 8;
             // 
             // label3
@@ -141,7 +141,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(382, 353);
+            this.ClientSize = new System.Drawing.Size(482, 453);
             this.Controls.Add(this.openLogButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.skipListBox);
@@ -151,11 +151,10 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.intervalComboBox);
             this.Controls.Add(this.selectFolderButton);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(400, 400);
+            this.MinimumSize = new System.Drawing.Size(500, 500);
             this.Name = "MainForm";
             this.Text = "WalMan";
             this.Load += new System.EventHandler(this.MainFormLoad);
