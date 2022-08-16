@@ -55,16 +55,16 @@ namespace WalMan
             Application.Exit();
         }
 
-        public static void StartTimer(int timerInterval)
+        public static void StartTimer(int timeInterval)
         {
-            Log.Add("StartTimer: " + timerInterval);
+            Log.Add($"StartTimer: {timeInterval}");
             asyncTimer?.Stop();
-            asyncTimer = new AsyncTimer(timerInterval, () => ExecuteCommand(nameof(Next)));
+            asyncTimer = new AsyncTimer(timeInterval, () => ExecuteCommand(nameof(Next)));
         }
 
         public static void ExecuteCommand(string commandName)
         {
-            Log.Add("ExecuteCommand: " + commandName);
+            Log.Add($"ExecuteCommand: {commandName}");
 
             if (commandTask?.IsCompleted == false)
                 return;
@@ -98,7 +98,7 @@ namespace WalMan
 
         public static void ChangeWallpaperFolder(string wallpaperFolder)
         {
-            Log.Add("ChangeWallpaperFolder: " + wallpaperFolder);
+            Log.Add($"ChangeWallpaperFolder: {wallpaperFolder}");
             Settings.wallpaperFolder = wallpaperFolder;
             Settings.remainingTime = 0;
             ExecuteCommand(nameof(Next));
@@ -109,7 +109,7 @@ namespace WalMan
             if (Settings.intervalIndex == intervalIndex)
                 return;
 
-            Log.Add("IntervalChanged: " + intervalIndex);
+            Log.Add($"IntervalChanged: {intervalIndex}");
             Settings.intervalIndex = intervalIndex;
         }
 
@@ -212,12 +212,12 @@ namespace WalMan
             if (File.Exists(Settings.currentWallpaper) == false)
                 return;
 
-            string directory = Path.GetDirectoryName(Settings.currentWallpaper) + @"\Masterpiece";
+            string directory = @$"{Path.GetDirectoryName(Settings.currentWallpaper)}\Masterpiece";
 
             if (Directory.Exists(directory) == false)
                 Directory.CreateDirectory(directory);
 
-            string filePath = directory + @"\" + Path.GetFileName(Settings.currentWallpaper);
+            string filePath = $@"{directory}\{Path.GetFileName(Settings.currentWallpaper)}";
 
             if (File.Exists(filePath) == false)
                 await Task.Run(() => File.Copy(Settings.currentWallpaper, filePath));

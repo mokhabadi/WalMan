@@ -1,31 +1,72 @@
-﻿namespace WalMan
+﻿using Microsoft.Win32;
+
+namespace WalMan
 {
     internal class AsyncTimer
     {
-        readonly DateTimeOffset startTime;
         readonly int timeInterval;
+        DateTimeOffset startTime;
+        DateTimeOffset suspendTime;
+        CancellationTokenSource? cancellationTokenSource;
 
-        public int RemainingTime => (int)(timeInterval - (DateTimeOffset.UtcNow - startTime).TotalSeconds);
+        public int RemainingTime => timeInterval - (int)(DateTimeOffset.UtcNow - startTime).TotalSeconds;
 
-        public Action? Elapsed;
+        public Action Elapsed;
 
         public AsyncTimer(int timeInterval, Action Elapsed)
         {
+            Log.Add($"AsyncTimer {timeInterval}");
             this.timeInterval = timeInterval;
             this.Elapsed = Elapsed;
             startTime = DateTimeOffset.UtcNow;
-            Start(timeInterval);
+            SystemEvents.PowerModeChanged += PowerModeChanged;
+            Start(this.timeInterval);
+        }
+
+        void PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            Log.Add($"PowerModeChanged: {e.Mode}");
+
+            if (e.Mode == PowerModes.Suspend)
+            {
+                cancellationTokenSource?.Cancel();
+                suspendTime = DateTimeOffset.UtcNow;
+            }
+
+            if (e.Mode == PowerModes.Resume)
+            {
+                startTime += DateTimeOffset.UtcNow - suspendTime;
+                Start(RemainingTime);
+            }
         }
 
         async void Start(int timeInterval)
         {
-            await Task.Delay(TimeSpan.FromSeconds(timeInterval));
+            Log.Add($"Start: {timeInterval}");
+            cancellationTokenSource = new();
+
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(timeInterval), cancellationTokenSource.Token);
+            }
+            catch (Exception exception)
+            {
+                Log.Add($"AsyncTimer Exception: {exception.Message}");
+                cancellationTokenSource?.Dispose();
+                cancellationTokenSource = null;
+                return;
+            }
+
             Elapsed?.Invoke();
+            Stop();
         }
 
         public void Stop()
         {
-            Elapsed = null;
+            SystemEvents.PowerModeChanged -= PowerModeChanged;
+            cancellationTokenSource?.Cancel();
+            cancellationTokenSource?.Dispose();
+            cancellationTokenSource = null;
         }
     }
 }
