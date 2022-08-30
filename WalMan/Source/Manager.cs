@@ -274,6 +274,9 @@ namespace WalMan
 
             int hours = minutes / 60;
 
+            if (minutes % 60 == 0)
+                return $"{hours} Hours";
+
             return $"{hours} Hours {minutes % 60} Minutes";
         }
 
