@@ -1,4 +1,6 @@
-﻿namespace WalMan
+﻿using System.Windows.Forms;
+
+namespace WalMan
 {
     partial class MainForm
     {
@@ -157,7 +159,6 @@
             this.MinimumSize = new System.Drawing.Size(500, 500);
             this.Name = "MainForm";
             this.Text = "WalMan";
-            this.Load += new System.EventHandler(this.MainFormLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 

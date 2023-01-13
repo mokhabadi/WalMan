@@ -1,5 +1,8 @@
-﻿using System.IO.Pipes;
+﻿using System;
+using System.IO.Pipes;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace WalMan
 {

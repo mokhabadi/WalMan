@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace WalMan
 {
@@ -6,9 +7,9 @@ namespace WalMan
     {
         static readonly string applicationName = Application.ProductName;
 
-        public static void EnableFeatures()
+        public static void EnableFeatures(Command[] commands)
         {
-            CreateDesktopMenu();
+            CreateDesktopMenu(commands);
             StartUp(true);
         }
 
@@ -18,7 +19,7 @@ namespace WalMan
             StartUp(false);
         }
 
-        static void CreateDesktopMenu()
+        static void CreateDesktopMenu(Command[] commands)
         {
             string desktopShell = @"SOFTWARE\Classes\Directory\Background\shell";
             RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShell, true);
@@ -35,7 +36,7 @@ namespace WalMan
             RegistryKey rootRegistryKey = key.CreateSubKey("shell");
             int index = 1;
 
-            foreach (Command command in Manager.Commands)
+            foreach (Command command in commands)
             {
                 key = rootRegistryKey.CreateSubKey(index.ToString() + "- " + command);
                 key.SetValue(null, command.Description);

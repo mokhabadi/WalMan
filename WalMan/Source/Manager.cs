@@ -1,44 +1,53 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
-using WalMan.Properties;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using WalMan.Settings;
 
 namespace WalMan
 {
-    internal static class Manager
+    internal class Manager
     {
-        static Task? commandTask;
-        static AsyncTimer? asyncTimer;
-        static List<string> filePathList = new();
-        static Dictionary<string, Command>? commandDictionary;
-        static readonly MainForm mainForm = new();
+        Task? commandTask;
+        AsyncTimer? asyncTimer;
+        List<string> filePathList = new();
+        Dictionary<string, Command>? commandDictionary;
+        readonly MainForm mainForm = new();
         public static readonly int[] timeIntervals = { 10, 30, 60, 180, 600, 1800, 3600, 7200, 10800 };
 
-        static Settings Settings => Settings.Default;
-        static string WallpaperPath => Application.StartupPath + "Wallpaper.bmp";
-        public static Command[] Commands => commandList.ToArray();
+        Properties.Settings Settings => Properties.Settings.Default;
+        string WallpaperPath => Application.StartupPath + "Wallpaper.bmp";
+        public Command[] commands;
 
-        static readonly List<Command> commandList = new()
+        public Manager()
         {
-            new Command(Reload),
+            commands = new[]
+        {
+                new Command(Reload),
             new Command(Next),
             new Command(Skip),
             new Command(Delete),
             new Command(MarkAsMasterpiece, "Mark as Masterpiece"),
             new Command(ShowInExplorer, "Show in Explorer"),
         };
+        }
 
-        public static void Load()
+
+
+        public void Load()
         {
-            WindowsRegistry.EnableFeatures();
+            WindowsRegistry.EnableFeatures(commands);
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
             Application.ApplicationExit += ApplicationExit;
             SystemEvents.SessionEnding += SystemEventsSessionEnding;
             mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
             mainForm.IntervalChanged += IntervalChanged;
-            mainForm.Loaded += MainFormLoaded;
             mainForm.DisableClicked += MainFormDisableClicked;
 
             if (Settings.skips == null)
@@ -50,19 +59,19 @@ namespace WalMan
                 ChangeWallpaperFolder(Settings.wallpaperFolder);
         }
 
-        static void SystemEventsSessionEnding(object sender, SessionEndingEventArgs e)
+        void SystemEventsSessionEnding(object sender, SessionEndingEventArgs e)
         {
             Application.Exit();
         }
 
-        public static void StartTimer(int timeInterval)
+        public void StartTimer(int timeInterval)
         {
             Log.Add($"StartTimer: {timeInterval}");
             asyncTimer?.Stop();
             asyncTimer = new AsyncTimer(timeInterval, () => ExecuteCommand(nameof(Next)));
         }
 
-        public static void ExecuteCommand(string commandName)
+        public void ExecuteCommand(string commandName)
         {
             Log.Add($"ExecuteCommand: {commandName}");
 
@@ -88,7 +97,7 @@ namespace WalMan
             {
                 commandDictionary = new Dictionary<string, Command>();
 
-                foreach (Command command in commandList)
+                foreach (Command command in commands)
                     commandDictionary.Add(command.Name, command);
             }
 
@@ -96,7 +105,7 @@ namespace WalMan
                 commandTask = commandDictionary[commandName].Action();
         }
 
-        public static void ChangeWallpaperFolder(string wallpaperFolder)
+        public void ChangeWallpaperFolder(string wallpaperFolder)
         {
             Log.Add($"ChangeWallpaperFolder: {wallpaperFolder}");
             Settings.wallpaperFolder = wallpaperFolder;
@@ -104,7 +113,7 @@ namespace WalMan
             ExecuteCommand(nameof(Next));
         }
 
-        public static void IntervalChanged(int intervalIndex)
+        public void IntervalChanged(int intervalIndex)
         {
             if (Settings.intervalIndex == intervalIndex)
                 return;
@@ -113,7 +122,7 @@ namespace WalMan
             Settings.intervalIndex = intervalIndex;
         }
 
-        static async Task UpdateFilePathList()
+        async Task UpdateFilePathList()
         {
             await Task.Run(() =>
             {
@@ -123,7 +132,7 @@ namespace WalMan
             });
         }
 
-        static async Task Reload()
+        async Task Reload()
         {
             if (File.Exists(Settings.currentWallpaper) == false)
                 return;
@@ -134,7 +143,7 @@ namespace WalMan
                 await SetDesktopBackground(stream);
         }
 
-        static async Task Next()
+        async Task Next()
         {
             if (Settings.wallpaperFolder == "" || Directory.Exists(Settings.wallpaperFolder) == false)
                 return;
@@ -147,7 +156,7 @@ namespace WalMan
                 StartTimer(timeIntervals[Settings.intervalIndex]);
         }
 
-        static async Task<bool> SetWallpaper(int wallpaperIndex)
+        async Task<bool> SetWallpaper(int wallpaperIndex)
         {
             List<string> skipList = new(Settings.skips);
             int startIndex = wallpaperIndex;
@@ -180,7 +189,7 @@ namespace WalMan
             }
         }
 
-        static async Task SetDesktopBackground(Stream stream)
+        async Task SetDesktopBackground(Stream stream)
         {
             FileStream fileStream = new(WallpaperPath, FileMode.Create, FileAccess.ReadWrite);
             await stream.CopyToAsync(fileStream);
@@ -189,7 +198,7 @@ namespace WalMan
             await Task.Run(() => File.Delete(WallpaperPath));
         }
 
-        static async Task Skip()
+        async Task Skip()
         {
             List<string> skipList = new(Settings.skips);
             skipList.Add(Settings.currentWallpaper);
@@ -197,7 +206,7 @@ namespace WalMan
             await Next();
         }
 
-        static async Task Delete()
+        async Task Delete()
         {
             if (File.Exists(Settings.currentWallpaper) == false)
                 return;
@@ -207,7 +216,7 @@ namespace WalMan
             await Task.Run(() => FileSystem.DeleteFile(fileToDelete, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin));
         }
 
-        static async Task MarkAsMasterpiece()
+        async Task MarkAsMasterpiece()
         {
             if (File.Exists(Settings.currentWallpaper) == false)
                 return;
@@ -223,7 +232,7 @@ namespace WalMan
                 await Task.Run(() => File.Copy(Settings.currentWallpaper, filePath));
         }
 
-        static async Task ShowInExplorer()
+        async Task ShowInExplorer()
         {
             if (File.Exists(Settings.currentWallpaper) == false)
                 return;
@@ -231,30 +240,26 @@ namespace WalMan
             await Task.Run(() => Process.Start("explorer.exe", $"/select,\"{Settings.currentWallpaper}\""));
         }
 
-        static void ApplicationExit(object? sender, EventArgs e)
+        void ApplicationExit(object? sender, EventArgs e)
         {
             Settings.remainingTime = asyncTimer == null ? 0 : asyncTimer.RemainingTime;
             Log.Add(@"\----- ApplicationExit -----/");
             Log.Wait();
         }
 
-        public static void Open()
+        public void Open()
         {
+            mainForm.Initialize(Settings.wallpaperFolder, Settings.intervalIndex, Settings.skips);
             mainForm.ShowDialog();
         }
 
-        static void MainFormLoaded()
-        {
-            mainForm.Initialize(Settings.wallpaperFolder, Settings.intervalIndex, Settings.skips);
-        }
-
-        static void MainFormDisableClicked()
+        void MainFormDisableClicked()
         {
             WindowsRegistry.DisableFeatures();
             Settings.Reset();
         }
 
-        public static string GetRemaining()
+        public string GetRemaining()
         {
             if (asyncTimer != null)
                 return SecondToString(asyncTimer.RemainingTime);

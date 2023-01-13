@@ -1,3 +1,8 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
 namespace WalMan
 {
     internal static class Program
@@ -20,10 +25,12 @@ namespace WalMan
                 Application.Run(new MainApplicationContext());
                 mutex.ReleaseMutex();
             }
-            else
+
+            string[] parameters = Environment.GetCommandLineArgs();
+
+            if (parameters.Length >= 2)
             {
-                string[] parameters = Environment.GetCommandLineArgs();
-                string command = parameters.Length >= 2 ? parameters[1] : "Open";
+                string command = parameters[1];
                 await NamedPipeStream.Send(command);
             }
         }

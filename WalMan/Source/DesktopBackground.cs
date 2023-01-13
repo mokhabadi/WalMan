@@ -1,5 +1,7 @@
 ﻿using Microsoft.Win32;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace WalMan
 {

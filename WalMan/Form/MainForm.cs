@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace WalMan
 {
@@ -6,21 +8,14 @@ namespace WalMan
     {
         public event Action<string>? WallpaperFolderChanged;
         public event Action<int>? IntervalChanged;
-        public event Action? Loaded;
         public event Action? DisableClicked;
 
         public MainForm()
         {
             InitializeComponent();
-        }
 
-        void MainFormLoad(object sender, EventArgs e)
-        {
-            if (intervalComboBox.Items.Count == 0)
-                foreach (int timeInterval in Manager.timeIntervals)
-                    intervalComboBox.Items.Add(Manager.SecondToString(timeInterval));
-
-            Loaded?.Invoke();
+            foreach (int timeInterval in Manager.timeIntervals)
+                intervalComboBox.Items.Add(Manager.SecondToString(timeInterval));
         }
 
         public void Initialize(string wallpaperFolder, int currentInterval, string[] skips)

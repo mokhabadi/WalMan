@@ -7,6 +7,7 @@
     using SixLabors.ImageSharp.Processing;
     using System.IO;
     using System.Threading.Tasks;
+    using System.Windows.Forms;
 
     internal static class WalCreator
     {
