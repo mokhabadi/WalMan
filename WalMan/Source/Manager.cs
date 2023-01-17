@@ -7,7 +7,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WalMan.Settings;
 
 namespace WalMan
 {
@@ -16,13 +15,13 @@ namespace WalMan
         Task? commandTask;
         AsyncTimer? asyncTimer;
         List<string> filePathList = new();
-        Dictionary<string, Command>? commandDictionary;
+        readonly Dictionary<string, Command> commandDictionary;
         readonly MainForm mainForm = new();
         public static readonly int[] timeIntervals = { 10, 30, 60, 180, 600, 1800, 3600, 7200, 10800 };
 
-        Properties.Settings Settings => Properties.Settings.Default;
-        string WallpaperPath => Application.StartupPath + "Wallpaper.bmp";
+        readonly string wallpaperPath = "Wallpaper.bmp";
         public Command[] commands;
+        UserData userData;
 
         public Manager()
         {
@@ -35,11 +34,17 @@ namespace WalMan
             new Command(MarkAsMasterpiece, "Mark as Masterpiece"),
             new Command(ShowInExplorer, "Show in Explorer"),
         };
+            commandDictionary = new();
+
+            foreach (Command command in commands)
+                commandDictionary.Add(command.Name, command);
+
+            userData = new();
         }
 
 
 
-        public void Load()
+        public async void Load()
         {
             WindowsRegistry.EnableFeatures(commands);
             NamedPipeStream.OnReceive += ExecuteCommand;
@@ -49,17 +54,13 @@ namespace WalMan
             mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
             mainForm.IntervalChanged += IntervalChanged;
             mainForm.DisableClicked += MainFormDisableClicked;
+            userData = await DataFile.QuickLoad<UserData>() ?? new();
 
-            if (Settings.skips == null)
-                Settings.skips = Array.Empty<string>();
-
-            if (Settings.currentWallpaper != "")
-                StartTimer(Settings.remainingTime);
-            else if (Settings.wallpaperFolder != "")
-                ChangeWallpaperFolder(Settings.wallpaperFolder);
+            if (userData.CurrentWallpaper != null)
+                StartTimer(userData.RemainingTime);
         }
 
-        void SystemEventsSessionEnding(object sender, SessionEndingEventArgs e)
+        void SystemEventsSessionEnding(object sender, SessionEndingEventArgs sessionEndingEventArgs)
         {
             Application.Exit();
         }
@@ -90,16 +91,8 @@ namespace WalMan
                 return;
             }
 
-            if (Settings.wallpaperFolder == "" || Directory.Exists(Settings.wallpaperFolder) == false)
+            if (Directory.Exists(userData.WallpaperFolder) == false)
                 return;
-
-            if (commandDictionary == null)
-            {
-                commandDictionary = new Dictionary<string, Command>();
-
-                foreach (Command command in commands)
-                    commandDictionary.Add(command.Name, command);
-            }
 
             if (commandDictionary.ContainsKey(commandName))
                 commandTask = commandDictionary[commandName].Action();
@@ -108,25 +101,25 @@ namespace WalMan
         public void ChangeWallpaperFolder(string wallpaperFolder)
         {
             Log.Add($"ChangeWallpaperFolder: {wallpaperFolder}");
-            Settings.wallpaperFolder = wallpaperFolder;
-            Settings.remainingTime = 0;
+            userData.SetWallpaperFolder(wallpaperFolder);
+            userData.SetRemainingTime(0);
             ExecuteCommand(nameof(Next));
         }
 
         public void IntervalChanged(int intervalIndex)
         {
-            if (Settings.intervalIndex == intervalIndex)
+            if (userData.Interval == intervalIndex)
                 return;
 
             Log.Add($"IntervalChanged: {intervalIndex}");
-            Settings.intervalIndex = intervalIndex;
+            userData.SetInterval(intervalIndex);
         }
 
         async Task UpdateFilePathList()
         {
             await Task.Run(() =>
             {
-                string[] filePaths = Directory.GetFiles(Settings.wallpaperFolder);
+                string[] filePaths = Directory.GetFiles(userData.WallpaperFolder);
                 filePathList = new(filePaths);
                 filePathList.Sort((x, y) => StrCmpLogicalW(x, y));
             });
@@ -134,10 +127,10 @@ namespace WalMan
 
         async Task Reload()
         {
-            if (File.Exists(Settings.currentWallpaper) == false)
+            if (File.Exists(userData.CurrentWallpaper) == false)
                 return;
 
-            Stream? stream = await WalCreator.Create(Settings.currentWallpaper);
+            Stream? stream = await WalCreator.Create(userData.CurrentWallpaper);
 
             if (stream != null)
                 await SetDesktopBackground(stream);
@@ -145,20 +138,19 @@ namespace WalMan
 
         async Task Next()
         {
-            if (Settings.wallpaperFolder == "" || Directory.Exists(Settings.wallpaperFolder) == false)
+            if (Directory.Exists(userData.WallpaperFolder) == false)
                 return;
 
             await UpdateFilePathList();
-            int wallpaperIndex = filePathList.IndexOf(Settings.currentWallpaper);
+            int wallpaperIndex = filePathList.IndexOf(userData.CurrentWallpaper);
             bool result = await SetWallpaper(wallpaperIndex);
 
             if (result == true)
-                StartTimer(timeIntervals[Settings.intervalIndex]);
+                StartTimer(userData.Interval);
         }
 
         async Task<bool> SetWallpaper(int wallpaperIndex)
         {
-            List<string> skipList = new(Settings.skips);
             int startIndex = wallpaperIndex;
 
             while (true)
@@ -174,7 +166,7 @@ namespace WalMan
                 if (wallpaperIndex == startIndex)
                     return false;
 
-                if (skipList.Contains(filePathList[wallpaperIndex]))
+                if (userData.SkipsContain(filePathList[wallpaperIndex]))
                     continue;
 
                 Stream? stream = await WalCreator.Create(filePathList[wallpaperIndex]);
@@ -182,8 +174,7 @@ namespace WalMan
                 if (stream != null)
                 {
                     await SetDesktopBackground(stream);
-                    Settings.currentWallpaper = filePathList[wallpaperIndex];
-                    Settings.Save();
+                    userData.SetCurrentWallpaper(filePathList[wallpaperIndex]);
                     return true;
                 }
             }
@@ -191,72 +182,67 @@ namespace WalMan
 
         async Task SetDesktopBackground(Stream stream)
         {
-            FileStream fileStream = new(WallpaperPath, FileMode.Create, FileAccess.ReadWrite);
+            FileStream fileStream = new(wallpaperPath, FileMode.Create, FileAccess.ReadWrite);
             await stream.CopyToAsync(fileStream);
             fileStream.Close();
-            await DesktopBackground.Set(WallpaperPath, DesktopBackground.Style.Center);
-            await Task.Run(() => File.Delete(WallpaperPath));
+            await DesktopBackground.Set(wallpaperPath, DesktopBackground.Style.Center);
+            await Task.Run(() => File.Delete(wallpaperPath));
         }
 
         async Task Skip()
         {
-            List<string> skipList = new(Settings.skips);
-            skipList.Add(Settings.currentWallpaper);
-            Settings.skips = skipList.ToArray();
+            userData.AddSkip();
             await Next();
         }
 
         async Task Delete()
         {
-            if (File.Exists(Settings.currentWallpaper) == false)
-                return;
-
-            string fileToDelete = Settings.currentWallpaper;
+            string? fileToDelete = userData.CurrentWallpaper;
             await Next();
-            await Task.Run(() => FileSystem.DeleteFile(fileToDelete, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin));
+
+            if (File.Exists(fileToDelete))
+                await Task.Run(() => FileSystem.DeleteFile(fileToDelete, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin));
         }
 
         async Task MarkAsMasterpiece()
         {
-            if (File.Exists(Settings.currentWallpaper) == false)
+            if (File.Exists(userData.CurrentWallpaper) == false)
                 return;
 
-            string directory = @$"{Path.GetDirectoryName(Settings.currentWallpaper)}\Masterpiece";
+            string directory = @$"{Path.GetDirectoryName(userData.CurrentWallpaper)}\Masterpiece";
 
             if (Directory.Exists(directory) == false)
                 Directory.CreateDirectory(directory);
 
-            string filePath = $@"{directory}\{Path.GetFileName(Settings.currentWallpaper)}";
+            string filePath = $@"{directory}\{Path.GetFileName(userData.CurrentWallpaper)}";
 
             if (File.Exists(filePath) == false)
-                await Task.Run(() => File.Copy(Settings.currentWallpaper, filePath));
+                await Task.Run(() => File.Copy(userData.CurrentWallpaper, filePath));
         }
 
         async Task ShowInExplorer()
         {
-            if (File.Exists(Settings.currentWallpaper) == false)
-                return;
-
-            await Task.Run(() => Process.Start("explorer.exe", $"/select,\"{Settings.currentWallpaper}\""));
+            if (File.Exists(userData.CurrentWallpaper))
+                await Task.Run(() => Process.Start("explorer.exe", $"/select,\"{userData.CurrentWallpaper}\""));
         }
 
         void ApplicationExit(object? sender, EventArgs e)
         {
-            Settings.remainingTime = asyncTimer == null ? 0 : asyncTimer.RemainingTime;
+            userData.SetRemainingTime(asyncTimer == null ? 0 : asyncTimer.RemainingTime);
             Log.Add(@"\----- ApplicationExit -----/");
             Log.Wait();
         }
 
         public void Open()
         {
-            mainForm.Initialize(Settings.wallpaperFolder, Settings.intervalIndex, Settings.skips);
+            mainForm.Initialize(userData.WallpaperFolder, userData.Interval, userData.Skips);
             mainForm.ShowDialog();
         }
 
         void MainFormDisableClicked()
         {
             WindowsRegistry.DisableFeatures();
-            Settings.Reset();
+            userData.Reset();
         }
 
         public string GetRemaining()

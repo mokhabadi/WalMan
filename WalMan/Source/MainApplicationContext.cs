@@ -14,7 +14,7 @@ namespace WalMan
 
         public MainApplicationContext()
         {
-            Log.Add(@"/+++++ Application Run +++++\");
+            Log.Add(@"//////////////// Application Run \\\\\\\\\\\\\\\\");
             List<ToolStripItem> toolStripItems = new();
             manager = new();
 
@@ -45,13 +45,13 @@ namespace WalMan
         {
             notifyIcon.MouseMove -= NotifyIconMouseMove;
             notifyIcon.Text = manager.GetRemaining();
-            await Task.Delay(500);
+            await Task.Delay(1000);
             notifyIcon.MouseMove += NotifyIconMouseMove;
         }
 
-        void NotifyIconMouseUp(object? sender, MouseEventArgs e)
+        void NotifyIconMouseUp(object? sender, MouseEventArgs MouseEventArgs)
         {
-            if (e.Button != MouseButtons.Left)
+            if (MouseEventArgs.Button != MouseButtons.Left)
                 return;
 
             MethodInfo? methodInfo = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);

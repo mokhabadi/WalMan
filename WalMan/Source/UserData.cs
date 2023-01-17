@@ -11,22 +11,14 @@ namespace WalMan
         public int RemainingTime { get; private set; }
         public string? WallpaperFolder { get; private set; }
         public string? CurrentWallpaper { get; private set; }
-        public List<string> Skips { get; private set; }
+        List<string> skips;
+
+        public string[] Skips => skips.ToArray();
 
         public event Action? DateChange;
 
         public UserData()
         {
-            Skips = new();
-        }
-
-        public UserData(int interval, int remainingTime, string? wallpaperFolder, string? currentWallpaper, List<string> skips)
-        {
-            Interval = interval;
-            RemainingTime = remainingTime;
-            WallpaperFolder = wallpaperFolder;
-            CurrentWallpaper = currentWallpaper;
-            Skips = skips;
         }
 
         public void SetInterval(int interval)
@@ -56,14 +48,26 @@ namespace WalMan
         public void AddSkip()
         {
             string fileName = Path.GetFileName(CurrentWallpaper)!;
-            Skips.Add(fileName);
+            skips.Add(fileName);
             DateChange?.Invoke();
         }
 
         public void RemoveSkip(string skip)
         {
-            Skips.Remove(skip);
+            skips.Remove(skip);
             DateChange?.Invoke();
+        }
+
+        public bool SkipsContain(string fileName)
+        {
+            return skips.Contains(fileName);
+        }
+
+        public void Reset()
+        {
+            WallpaperFolder = null;
+            CurrentWallpaper = null;
+            RemainingTime = 0;
         }
     }
 }
