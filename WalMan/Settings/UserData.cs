@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace WalMan
 {
@@ -52,9 +53,10 @@ namespace WalMan
             DateChange?.Invoke();
         }
 
-        public void AddSkip(string skip)
+        public void AddSkip()
         {
-            Skips.Add(skip);
+            string fileName = Path.GetFileName(CurrentWallpaper)!;
+            Skips.Add(fileName);
             DateChange?.Invoke();
         }
 
