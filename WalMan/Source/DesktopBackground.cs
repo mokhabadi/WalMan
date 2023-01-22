@@ -41,8 +41,8 @@ namespace WalMan
             if (key == null)
                 return;
 
-            key.SetValue(@"WallpaperStyle", styles[style].Style.ToString());
-            key.SetValue(@"TileWallpaper", styles[style].Tile.ToString());
+            key.SetValue("WallpaperStyle", styles[style].Style.ToString());
+            key.SetValue("TileWallpaper", styles[style].Tile.ToString());
             int result = await Task.Run(() => SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, filePath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE));
             Log.Add("Wallpaper Set " + (result > 0 ? "Successfully" : "failed"));
         }

@@ -6,6 +6,8 @@ namespace WalMan
     internal static class WindowsRegistry
     {
         static readonly string applicationName = Application.ProductName;
+        static readonly string startUpRegisteryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+        static readonly string desktopShellRegisteryPath = @"SOFTWARE\Classes\Directory\Background\shell";
 
         public static void EnableFeatures(Command[] commands)
         {
@@ -15,14 +17,23 @@ namespace WalMan
 
         public static void DisableFeatures()
         {
-            DeleteDesktopMenu();
+            DisableDesktopMenu();
             StartUp(false);
+        }
+
+        static void StartUp(bool enable)
+        {
+            RegistryKey? key = Registry.CurrentUser.OpenSubKey(startUpRegisteryPath, true);
+
+            if (enable)
+                key?.SetValue(applicationName, Application.ExecutablePath.Enquote());
+            else
+                key?.DeleteValue(applicationName, false);
         }
 
         static void CreateDesktopMenu(Command[] commands)
         {
-            string desktopShell = @"SOFTWARE\Classes\Directory\Background\shell";
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShell, true);
+            RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShellRegisteryPath, true);
 
             if (key == null)
                 return;
@@ -47,28 +58,12 @@ namespace WalMan
             }
         }
 
-        static void DeleteDesktopMenu()
+        static void DisableDesktopMenu()
         {
-            string desktopShell = @"SOFTWARE\Classes\Directory\Background\shell";
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShell, true);
+            RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShellRegisteryPath, true);
 
             if (key?.OpenSubKey(applicationName) != null)
                 key.DeleteSubKeyTree(applicationName);
-        }
-
-        static void StartUp(bool enable)
-        {
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
-
-            if (enable)
-                key?.SetValue(applicationName, Application.ExecutablePath.Enquote());
-            else if (key?.GetValue(applicationName) != null)
-                key.DeleteValue(applicationName);
-        }
-
-        public static string Enquote(this string value)
-        {
-            return $"\"{value}\"";
         }
     }
 }

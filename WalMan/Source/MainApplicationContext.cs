@@ -38,7 +38,7 @@ namespace WalMan
             notifyIcon.MouseMove += NotifyIconMouseMove;
             notifyIcon.MouseUp += NotifyIconMouseUp;
             Application.ApplicationExit += (sender, eventArgs) => notifyIcon.Visible = false;
-            manager.Load();
+            manager.Initialize();
         }
 
         async void NotifyIconMouseMove(object? sender, EventArgs e)

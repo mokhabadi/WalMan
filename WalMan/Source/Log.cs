@@ -2,8 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Environment;
 
 namespace WalMan
 {
@@ -11,7 +9,7 @@ namespace WalMan
     {
         static readonly System.Collections.Concurrent.ConcurrentQueue<string> queue = new();
         static Task task = Task.CompletedTask;
-        public static readonly string filePath = $"{GetFolderPath(SpecialFolder.LocalApplicationData)}\\{Application.ProductName}\\Log.txt";
+        public static readonly string fileName = "Log.txt";
 
         public static void Wait()
         {
@@ -35,7 +33,7 @@ namespace WalMan
             while (queue.TryDequeue(out string? nextMessage))
                 stringBuilder.Append(nextMessage);
 
-            await File.AppendAllTextAsync(filePath, stringBuilder.ToString());
+            await File.AppendAllTextAsync(fileName, stringBuilder.ToString());
 
             if (!queue.IsEmpty)
                 await Save();

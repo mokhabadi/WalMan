@@ -17,14 +17,16 @@ namespace WalMan
         List<string> filePathList = new();
         readonly Dictionary<string, Command> commandDictionary;
         readonly MainForm mainForm = new();
-        public static readonly int[] timeIntervals = { 10, 30, 60, 180, 600, 1800, 3600, 7200, 10800 };
 
-        readonly string wallpaperPath = "Wallpaper.bmp";
+        static readonly string BackgroundFileName = "Background.bmp";
         public Command[] commands;
         UserData userData;
+        readonly string[] fileNames = { Log.fileName, nameof(userData), BackgroundFileName };
 
         public Manager()
         {
+
+
             commands = new[]
         {
                 new Command(Reload),
@@ -44,8 +46,17 @@ namespace WalMan
 
 
 
-        public async void Load()
+        public async void Initialize()
         {
+            Exception? exception = CheckFiles();
+
+            if (exception != null)
+            {
+                //show warning
+                return;
+            }
+
+            userData = await DataFile.QuickLoad<UserData>() ?? new();
             WindowsRegistry.EnableFeatures(commands);
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
@@ -54,10 +65,25 @@ namespace WalMan
             mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
             mainForm.IntervalChanged += IntervalChanged;
             mainForm.DisableClicked += MainFormDisableClicked;
-            userData = await DataFile.QuickLoad<UserData>() ?? new();
 
             if (userData.CurrentWallpaper != null)
                 StartTimer(userData.RemainingTime);
+        }
+
+        Exception? CheckFiles()
+        {
+            try
+            {
+                foreach (string fileName in fileNames)
+                    if (File.Exists(fileName) == false)
+                        File.Create(fileName);
+            }
+            catch (Exception exception)
+            {
+                return exception;
+            }
+
+            return null;
         }
 
         void SystemEventsSessionEnding(object sender, SessionEndingEventArgs sessionEndingEventArgs)
@@ -106,13 +132,13 @@ namespace WalMan
             ExecuteCommand(nameof(Next));
         }
 
-        public void IntervalChanged(int intervalIndex)
+        public void IntervalChanged(int interval)
         {
-            if (userData.Interval == intervalIndex)
+            if (userData.Interval == interval)
                 return;
 
-            Log.Add($"IntervalChanged: {intervalIndex}");
-            userData.SetInterval(intervalIndex);
+            Log.Add($"IntervalChanged: {interval}");
+            userData.SetInterval(interval);
         }
 
         async Task UpdateFilePathList()
@@ -182,11 +208,11 @@ namespace WalMan
 
         async Task SetDesktopBackground(Stream stream)
         {
-            FileStream fileStream = new(wallpaperPath, FileMode.Create, FileAccess.ReadWrite);
+            FileStream fileStream = new(BackgroundFileName, FileMode.Create, FileAccess.ReadWrite);
             await stream.CopyToAsync(fileStream);
             fileStream.Close();
-            await DesktopBackground.Set(wallpaperPath, DesktopBackground.Style.Center);
-            await Task.Run(() => File.Delete(wallpaperPath));
+            await DesktopBackground.Set(BackgroundFileName, DesktopBackground.Style.Center);
+            await Task.Run(() => File.Delete(BackgroundFileName));
         }
 
         async Task Skip()
