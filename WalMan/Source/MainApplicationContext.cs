@@ -41,10 +41,37 @@ namespace WalMan
             manager.Initialize();
         }
 
+        void CreateMenu(Command[] commands)
+        {
+            List<ToolStripItem> toolStripItems = new();
+
+            foreach (Command command in manager.commands)
+                toolStripItems.Add(new ToolStripMenuItem(command.Description, null, (sender, eventArgs) => command.Action()));
+
+            toolStripItems.Add(new ToolStripSeparator());
+            toolStripItems.Add(new ToolStripMenuItem("Open", null, (sender, eventArgs) => manager.Open()));
+            toolStripItems.Add(new ToolStripMenuItem("Exit", null, (sender, eventArgs) => Application.Exit()));
+            ContextMenuStrip contextMenuStrip = new();
+            contextMenuStrip.Items.AddRange(toolStripItems.ToArray());
+
+            notifyIcon = new NotifyIcon()
+            {
+                Icon = Resources.WalMan,
+                ContextMenuStrip = contextMenuStrip,
+                Visible = true,
+                Text = "Disable",
+            };
+
+            notifyIcon.MouseMove += NotifyIconMouseMove;
+            notifyIcon.MouseUp += NotifyIconMouseUp;
+            Application.ApplicationExit += (sender, eventArgs) => notifyIcon.Visible = false;
+            manager.Initialize();
+        }
+
         async void NotifyIconMouseMove(object? sender, EventArgs e)
         {
             notifyIcon.MouseMove -= NotifyIconMouseMove;
-            notifyIcon.Text = manager.GetRemaining();
+            notifyIcon.Text = manager.GetRemainingTime();
             await Task.Delay(1000);
             notifyIcon.MouseMove += NotifyIconMouseMove;
         }

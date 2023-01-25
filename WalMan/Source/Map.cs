@@ -10,18 +10,24 @@ namespace WalMan
 
         public IEnumerator GetEnumerator() => KeyValues.GetEnumerator();
 
-        public void Add((TKey key, TValue value) keyValue)
-        {
-            Array.Resize(ref KeyValues, KeyValues.Length + 1);
-            KeyValues[^1] = keyValue;
-        }
-
         public void Add(TKey key, TValue value)
         {
             Add((key, value));
         }
 
-        public TValue? this[TKey key]
+        public void Add((TKey key, TValue value) keyValue)
+        {
+            if (keyValue.key == null)
+                throw new NullReferenceException("Key is null.");
+
+            if (HasKey(keyValue.key))
+                throw new ArgumentException("Key already exists.");
+
+            Array.Resize(ref KeyValues, KeyValues.Length + 1);
+            KeyValues[^1] = keyValue;
+        }
+
+        public TValue this[TKey key]
         {
             get
             {
@@ -29,8 +35,17 @@ namespace WalMan
                     if (EqualityComparer<TKey>.Default.Equals(key, keyValue.key))
                         return keyValue.value;
 
-                return default;
+                throw new KeyNotFoundException();
             }
+        }
+
+        public bool HasKey(TKey key)
+        {
+            foreach ((TKey key, TValue value) keyValue in KeyValues)
+                if (EqualityComparer<TKey>.Default.Equals(key, keyValue.key))
+                    return true;
+
+            return false;
         }
     }
 }

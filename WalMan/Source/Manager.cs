@@ -15,9 +15,8 @@ namespace WalMan
         Task? commandTask;
         AsyncTimer? asyncTimer;
         List<string> filePathList = new();
-        readonly Dictionary<string, Command> commandDictionary;
+        readonly Map<string, Command> commandMap;
         readonly MainForm mainForm = new();
-
         static readonly string BackgroundFileName = "Background.bmp";
         public Command[] commands;
         UserData userData;
@@ -25,21 +24,22 @@ namespace WalMan
 
         public Manager()
         {
-
-
             commands = new[]
-        {
+            {
                 new Command(Reload),
-            new Command(Next),
-            new Command(Skip),
-            new Command(Delete),
-            new Command(MarkAsMasterpiece, "Mark as Masterpiece"),
-            new Command(ShowInExplorer, "Show in Explorer"),
-        };
-            commandDictionary = new();
+                new Command(Next),
+                new Command(Skip),
+                new Command(Delete),
+                new Command(MarkAsMasterpiece, "Mark as Masterpiece"),
+                new Command(ShowInExplorer, "Show in Explorer"),
+                new Command(Settings),
+                new Command(Exit),
+            };
+
+            commandMap = new();
 
             foreach (Command command in commands)
-                commandDictionary.Add(command.Name, command);
+                commandMap.Add(command.Name, command);
 
             userData = new();
         }
@@ -52,7 +52,7 @@ namespace WalMan
 
             if (exception != null)
             {
-                //show warning
+                MessageBox.Show("Can't create necessary files.\n please run WalMan as administrator!");
                 return;
             }
 
@@ -120,8 +120,8 @@ namespace WalMan
             if (Directory.Exists(userData.WallpaperFolder) == false)
                 return;
 
-            if (commandDictionary.ContainsKey(commandName))
-                commandTask = commandDictionary[commandName].Action();
+            if (commandMap.HasKey(commandName))
+                commandTask = commandMap[commandName].Action();
         }
 
         public void ChangeWallpaperFolder(string wallpaperFolder)
@@ -254,15 +254,16 @@ namespace WalMan
 
         void ApplicationExit(object? sender, EventArgs e)
         {
-            userData.SetRemainingTime(asyncTimer == null ? 0 : asyncTimer.RemainingTime);
+            userData.SetRemainingTime(asyncTimer == null ? 0 : asyncTimer.RemainingTime());
             Log.Add(@"\----- ApplicationExit -----/");
             Log.Wait();
         }
 
-        public void Open()
+        public Task Settings()
         {
             mainForm.Initialize(userData.WallpaperFolder, userData.Interval, userData.Skips);
             mainForm.ShowDialog();
+            return Task.CompletedTask;
         }
 
         void MainFormDisableClicked()
@@ -271,12 +272,18 @@ namespace WalMan
             userData.Reset();
         }
 
-        public string GetRemaining()
+        public string GetRemainingTime()
         {
             if (asyncTimer != null)
-                return SecondToString(asyncTimer.RemainingTime);
+                return SecondToString(asyncTimer.RemainingTime());
 
             return "Disabled";
+        }
+
+        Task Exit()
+        {
+            Application.Exit();
+            return Task.CompletedTask;
         }
 
         public static string SecondToString(int seconds)

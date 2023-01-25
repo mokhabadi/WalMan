@@ -7,23 +7,34 @@ namespace WalMan
 {
     internal class AsyncTimer
     {
-        readonly int timeInterval;
+        readonly int interval;
         DateTimeOffset startTime;
         DateTimeOffset suspendTime;
         CancellationTokenSource? cancellationTokenSource;
 
-        public int RemainingTime => timeInterval - (int)(DateTimeOffset.UtcNow - startTime).TotalSeconds;
+        public Action? Elapsed;
 
-        public Action Elapsed;
-
-        public AsyncTimer(int timeInterval, Action Elapsed)
+        public AsyncTimer(int interval, Action Elapsed)
         {
-            Log.Add($"AsyncTimer {timeInterval}");
-            this.timeInterval = timeInterval;
+            Log.Add($"AsyncTimer {interval}");
+
+            if (interval <= 0)
+            {
+                Elapsed?.Invoke();
+                return;
+            }
+
+            this.interval = interval;
             this.Elapsed = Elapsed;
             startTime = DateTimeOffset.UtcNow;
             SystemEvents.PowerModeChanged += PowerModeChanged;
-            Start(this.timeInterval);
+            Start(interval);
+        }
+
+        public int RemainingTime()
+        {
+            int remainingTime = interval - (int)(DateTimeOffset.UtcNow - startTime).TotalSeconds;
+            return remainingTime > 0 ? remainingTime : 0;
         }
 
         void PowerModeChanged(object sender, PowerModeChangedEventArgs e)
@@ -39,18 +50,18 @@ namespace WalMan
             if (e.Mode == PowerModes.Resume)
             {
                 startTime += DateTimeOffset.UtcNow - suspendTime;
-                Start(RemainingTime);
+                Start(RemainingTime());
             }
         }
 
-        async void Start(int timeInterval)
+        async void Start(int interval)
         {
-            Log.Add($"Start: {timeInterval}");
+            Log.Add($"Start: {interval}");
             cancellationTokenSource = new();
 
             try
             {
-                await Task.Delay(TimeSpan.FromSeconds(timeInterval), cancellationTokenSource.Token);
+                await Task.Delay(TimeSpan.FromSeconds(interval), cancellationTokenSource.Token);
             }
             catch (Exception exception)
             {
