@@ -38,9 +38,7 @@ namespace WalMan
             if (key == null)
                 return;
 
-            if (key.OpenSubKey(applicationName) != null)
-                return;
-
+            key.DeleteSubKey(applicationName, false);
             key = key.CreateSubKey(applicationName);
             key.SetValue("SubCommands", "");
             key.SetValue("Icon", Application.ExecutablePath.Enquote(), RegistryValueKind.ExpandString);

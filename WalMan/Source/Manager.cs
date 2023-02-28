@@ -107,7 +107,7 @@ namespace WalMan
 
             if (commandName == "Open")
             {
-                Open();
+                Settings();
                 return;
             }
 
