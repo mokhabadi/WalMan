@@ -33,7 +33,7 @@ namespace WalMan
             }
 
             userData = await DataFile.QuickLoad<UserData>() ?? new();
-            userData.CurrentWallpaperChange += CurrentWallpaperChanged;
+            userData.CurrentWallpaperChange += CreateMenus;
             CreateMenus();
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
@@ -44,11 +44,6 @@ namespace WalMan
 
             if (userData.CurrentWallpaper != null)
                 StartTimer(userData.RemainingTime);
-        }
-
-        private void CurrentWallpaperChanged()
-        {
-            throw new NotImplementedException();
         }
 
         void CreateMenus()
