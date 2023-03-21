@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,9 +8,9 @@ namespace WalMan
 {
     internal static class Log
     {
-        static readonly System.Collections.Concurrent.ConcurrentQueue<string> queue = new();
-        static Task task = Task.CompletedTask;
         public static readonly string fileName = "Log.txt";
+        static readonly ConcurrentQueue<string> queue = new();
+        static Task task = Task.CompletedTask;
 
         public static void Wait()
         {

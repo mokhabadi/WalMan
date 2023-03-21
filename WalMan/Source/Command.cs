@@ -3,17 +3,21 @@ using System.Threading.Tasks;
 
 namespace WalMan
 {
-    internal class Command
+    public class Command
     {
-        public Func<Task> Action { get; private set; }
         public string Name { get; private set; }
-        public string Description { get; private set; }
+        public Func<Task> Action { get; private set; }
 
-        public Command(Func<Task> action, string? description = null)
+        public Command(Func<Task> action)
         {
             Action = action;
-            Name = action.Method.Name;
-            Description = description ?? Name;
+            Name = action.Method.Name.ToSentenceCase();
+        }
+
+        public Command(Func<Task> action, string name)
+        {
+            Action = action;
+            Name = name;
         }
 
         public override string ToString()

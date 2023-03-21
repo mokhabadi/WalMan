@@ -9,12 +9,6 @@ namespace WalMan
         static readonly string startUpRegisteryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
         static readonly string desktopShellRegisteryPath = @"SOFTWARE\Classes\Directory\Background\shell";
 
-        public static void EnableFeatures(Command[] commands)
-        {
-            CreateDesktopMenu(commands);
-            StartUp(true);
-        }
-
         public static void DisableFeatures()
         {
             DisableDesktopMenu();
@@ -31,7 +25,7 @@ namespace WalMan
                 key?.DeleteValue(applicationName, false);
         }
 
-        static void CreateDesktopMenu(Command[] commands)
+        public static void CreateMenu(Command[] commands)
         {
             RegistryKey? key = Registry.CurrentUser.OpenSubKey(desktopShellRegisteryPath, true);
 
@@ -48,7 +42,7 @@ namespace WalMan
             foreach (Command command in commands)
             {
                 key = rootRegistryKey.CreateSubKey(index.ToString() + "- " + command);
-                key.SetValue(null, command.Description);
+                key.SetValue(null, command.Name);
                 //key.SetValue("Icon", menuItems[index].iconPath);
                 key = key.CreateSubKey("command");
                 key.SetValue(null, Application.ExecutablePath.Enquote() + command, RegistryValueKind.ExpandString);

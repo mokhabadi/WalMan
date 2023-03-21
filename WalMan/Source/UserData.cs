@@ -6,16 +6,16 @@ namespace WalMan
 {
     internal class UserData
     {
-        public int Version { get; private set; }
         public int Interval { get; private set; }
         public int RemainingTime { get; private set; }
-        public string? WallpaperFolder { get; private set; }
         public string? CurrentWallpaper { get; private set; }
-        List<string> skips;
+
+        readonly List<string> skips;
 
         public string[] Skips => skips.ToArray();
 
         public event Action? DateChange;
+        public event Action? CurrentWallpaperChange;
 
         public UserData()
         {
@@ -33,15 +33,10 @@ namespace WalMan
             DateChange?.Invoke();
         }
 
-        public void SetWallpaperFolder(string wallpaperFolder)
-        {
-            WallpaperFolder = wallpaperFolder;
-            DateChange?.Invoke();
-        }
-
-        public void SetCurrentWallpaper(string currentWallpaper)
+        public void SetCurrentWallpaper(string? currentWallpaper)
         {
             CurrentWallpaper = currentWallpaper;
+            CurrentWallpaperChange?.Invoke();
             DateChange?.Invoke();
         }
 
@@ -65,7 +60,6 @@ namespace WalMan
 
         public void Reset()
         {
-            WallpaperFolder = null;
             CurrentWallpaper = null;
             RemainingTime = 0;
         }

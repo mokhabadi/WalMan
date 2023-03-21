@@ -24,6 +24,7 @@ namespace WalMan
                 ApplicationConfiguration.Initialize();
                 Application.Run(new MainApplicationContext());
                 mutex.ReleaseMutex();
+                return;
             }
 
             string[] parameters = Environment.GetCommandLineArgs();

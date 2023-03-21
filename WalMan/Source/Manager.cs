@@ -10,41 +10,16 @@ using System.Windows.Forms;
 
 namespace WalMan
 {
-    internal class Manager
+    public class Manager
     {
+        static readonly string BackgroundFileName = "Background.bmp";
+        readonly string[] fileNames = { Log.fileName, nameof(UserData), BackgroundFileName };
+        readonly Map<string, Command> commandMap = new();
+        readonly MainForm mainForm = new();
+        UserData userData;
         Task? commandTask;
         AsyncTimer? asyncTimer;
         List<string> filePathList = new();
-        readonly Map<string, Command> commandMap;
-        readonly MainForm mainForm = new();
-        static readonly string BackgroundFileName = "Background.bmp";
-        public Command[] commands;
-        UserData userData;
-        readonly string[] fileNames = { Log.fileName, nameof(userData), BackgroundFileName };
-
-        public Manager()
-        {
-            commands = new[]
-            {
-                new Command(Reload),
-                new Command(Next),
-                new Command(Skip),
-                new Command(Delete),
-                new Command(MarkAsMasterpiece, "Mark as Masterpiece"),
-                new Command(ShowInExplorer, "Show in Explorer"),
-                new Command(Settings),
-                new Command(Exit),
-            };
-
-            commandMap = new();
-
-            foreach (Command command in commands)
-                commandMap.Add(command.Name, command);
-
-            userData = new();
-        }
-
-
 
         public async void Initialize()
         {
@@ -53,21 +28,61 @@ namespace WalMan
             if (exception != null)
             {
                 MessageBox.Show("Can't create necessary files.\n please run WalMan as administrator!");
+                Application.Exit();
                 return;
             }
 
             userData = await DataFile.QuickLoad<UserData>() ?? new();
-            WindowsRegistry.EnableFeatures(commands);
+            userData.CurrentWallpaperChange += CurrentWallpaperChanged;
+            CreateMenus();
             NamedPipeStream.OnReceive += ExecuteCommand;
             NamedPipeStream.Receive();
             Application.ApplicationExit += ApplicationExit;
             SystemEvents.SessionEnding += SystemEventsSessionEnding;
-            mainForm.WallpaperFolderChanged += ChangeWallpaperFolder;
+            mainForm.CurrentWallpaperChange += WallpaperSelected;
             mainForm.IntervalChanged += IntervalChanged;
-            mainForm.DisableClicked += MainFormDisableClicked;
 
             if (userData.CurrentWallpaper != null)
                 StartTimer(userData.RemainingTime);
+        }
+
+        private void CurrentWallpaperChanged()
+        {
+            throw new NotImplementedException();
+        }
+
+        void CreateMenus()
+        {
+            Command[] commands = CreateCommands();
+            MainApplicationContext.CreateMenu(commands);
+            WindowsRegistry.CreateMenu(commands);
+        }
+
+        Command[] CreateCommands()
+        {
+            if (string.IsNullOrEmpty(userData.CurrentWallpaper))
+                return new Command[] { new(SelectWallpaper) };
+
+            Command[] commands =
+            {
+                new (OpenFile, userData.CurrentWallpaper),
+                new (Reload),
+                new (Next),
+                new (Skip),
+                new (Delete),
+                new (MarkAsMasterpiece),
+                new (ShowInExplorer),
+                new (Settings),
+                new (Exit),
+            };
+
+            return commands;
+        }
+
+        Task OpenFile()
+        {
+            Process.Start(userData.CurrentWallpaper);
+            return Task.CompletedTask;
         }
 
         Exception? CheckFiles()
@@ -105,31 +120,18 @@ namespace WalMan
             if (commandTask?.IsCompleted == false)
                 return;
 
-            if (commandName == "Open")
-            {
-                Settings();
-                return;
-            }
-
-            if (commandName == "Exit")
-            {
-                Application.Exit();
-                return;
-            }
-
-            if (Directory.Exists(userData.WallpaperFolder) == false)
-                return;
-
             if (commandMap.HasKey(commandName))
                 commandTask = commandMap[commandName].Action();
         }
 
-        public void ChangeWallpaperFolder(string wallpaperFolder)
+        public void WallpaperSelected(string? wallpaperFolder)
         {
-            Log.Add($"ChangeWallpaperFolder: {wallpaperFolder}");
-            userData.SetWallpaperFolder(wallpaperFolder);
+            userData.SetCurrentWallpaper(wallpaperFolder);
             userData.SetRemainingTime(0);
-            ExecuteCommand(nameof(Next));
+            Log.Add($"ChangeWallpaperFolder: {wallpaperFolder}");
+
+            if (wallpaperFolder != null)
+                ExecuteCommand(nameof(Next));
         }
 
         public void IntervalChanged(int interval)
@@ -145,7 +147,7 @@ namespace WalMan
         {
             await Task.Run(() =>
             {
-                string[] filePaths = Directory.GetFiles(userData.WallpaperFolder);
+                string[] filePaths = Directory.GetFiles(Path.GetDirectoryName(userData.CurrentWallpaper));
                 filePathList = new(filePaths);
                 filePathList.Sort((x, y) => StrCmpLogicalW(x, y));
             });
@@ -154,7 +156,10 @@ namespace WalMan
         async Task Reload()
         {
             if (File.Exists(userData.CurrentWallpaper) == false)
+            {
+                MessageBox.Show("Can't find current wallpaper!");
                 return;
+            }
 
             Stream? stream = await WalCreator.Create(userData.CurrentWallpaper);
 
@@ -164,8 +169,11 @@ namespace WalMan
 
         async Task Next()
         {
-            if (Directory.Exists(userData.WallpaperFolder) == false)
+            if (Directory.Exists(Path.GetDirectoryName(userData.CurrentWallpaper)) == false)
+            {
+                MessageBox.Show("Can't find current wallpaper directory!");
                 return;
+            }
 
             await UpdateFilePathList();
             int wallpaperIndex = filePathList.IndexOf(userData.CurrentWallpaper);
@@ -212,7 +220,6 @@ namespace WalMan
             await stream.CopyToAsync(fileStream);
             fileStream.Close();
             await DesktopBackground.Set(BackgroundFileName, DesktopBackground.Style.Center);
-            await Task.Run(() => File.Delete(BackgroundFileName));
         }
 
         async Task Skip()
@@ -233,7 +240,10 @@ namespace WalMan
         async Task MarkAsMasterpiece()
         {
             if (File.Exists(userData.CurrentWallpaper) == false)
+            {
+                MessageBox.Show("File not found!");
                 return;
+            }
 
             string directory = @$"{Path.GetDirectoryName(userData.CurrentWallpaper)}\Masterpiece";
 
@@ -259,25 +269,25 @@ namespace WalMan
             Log.Wait();
         }
 
+        Task SelectWallpaper()
+        {
+            return Task.CompletedTask;
+        }
+
         public Task Settings()
         {
-            mainForm.Initialize(userData.WallpaperFolder, userData.Interval, userData.Skips);
+            mainForm.Initialize(userData.CurrentWallpaper, userData.Interval, userData.Skips);
             mainForm.ShowDialog();
             return Task.CompletedTask;
         }
 
-        void MainFormDisableClicked()
-        {
-            WindowsRegistry.DisableFeatures();
-            userData.Reset();
-        }
-
         public string GetRemainingTime()
         {
-            if (asyncTimer != null)
-                return SecondToString(asyncTimer.RemainingTime());
+            if (asyncTimer == null)
+                return "Disabled";
 
-            return "Disabled";
+            return Statics.SecondToString(asyncTimer.RemainingTime());
+
         }
 
         Task Exit()
@@ -286,23 +296,6 @@ namespace WalMan
             return Task.CompletedTask;
         }
 
-        public static string SecondToString(int seconds)
-        {
-            if (seconds < 120)
-                return $"{seconds} Seconds";
-
-            int minutes = seconds / 60;
-
-            if (minutes < 120)
-                return $"{minutes} Minutes";
-
-            int hours = minutes / 60;
-
-            if (minutes % 60 == 0)
-                return $"{hours} Hours";
-
-            return $"{hours} Hours {minutes % 60} Minutes";
-        }
 
         [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         static extern int StrCmpLogicalW(string x, string y);

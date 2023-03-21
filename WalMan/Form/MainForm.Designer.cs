@@ -30,152 +30,154 @@ namespace WalMan
         /// </summary>
         private void InitializeComponent()
         {
-            this.selectFolderButton = new System.Windows.Forms.Button();
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.intervalComboBox = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.wallpaperFolderLabel = new System.Windows.Forms.Label();
-            this.unregisterButton = new System.Windows.Forms.Button();
-            this.skipListBox = new System.Windows.Forms.ListBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.openLogButton = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            selectWallpaperButton = new Button();
+            intervalComboBox = new ComboBox();
+            label2 = new Label();
+            label1 = new Label();
+            currentWallpaperLabel = new Label();
+            unregisterButton = new Button();
+            skipListBox = new ListBox();
+            label3 = new Label();
+            openLogButton = new Button();
+            openFileDialog = new OpenFileDialog();
+            SuspendLayout();
             // 
-            // selectFolderButton
+            // selectWallpaperButton
             // 
-            this.selectFolderButton.Location = new System.Drawing.Point(12, 39);
-            this.selectFolderButton.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.selectFolderButton.Name = "selectFolderButton";
-            this.selectFolderButton.Size = new System.Drawing.Size(128, 33);
-            this.selectFolderButton.TabIndex = 1;
-            this.selectFolderButton.Text = "Select folder";
-            this.selectFolderButton.UseVisualStyleBackColor = true;
-            this.selectFolderButton.Click += new System.EventHandler(this.SelectFolderButtonClick);
-            // 
-            // folderBrowserDialog
-            // 
-            this.folderBrowserDialog.Description = "Select wallpapers folder";
+            selectWallpaperButton.Location = new System.Drawing.Point(20, 50);
+            selectWallpaperButton.Margin = new Padding(5, 6, 5, 6);
+            selectWallpaperButton.Name = "selectWallpaperButton";
+            selectWallpaperButton.Size = new System.Drawing.Size(208, 42);
+            selectWallpaperButton.TabIndex = 1;
+            selectWallpaperButton.Text = "Select Wallpaper";
+            selectWallpaperButton.UseVisualStyleBackColor = true;
+            selectWallpaperButton.Click += SelectFolderButtonClick;
             // 
             // intervalComboBox
             // 
-            this.intervalComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.intervalComboBox.FormattingEnabled = true;
-            this.intervalComboBox.Location = new System.Drawing.Point(12, 107);
-            this.intervalComboBox.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.intervalComboBox.Name = "intervalComboBox";
-            this.intervalComboBox.Size = new System.Drawing.Size(128, 33);
-            this.intervalComboBox.TabIndex = 3;
-            this.intervalComboBox.SelectedIndexChanged += new System.EventHandler(this.IntervalComboBoxSelectedIndexChanged);
+            intervalComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+            intervalComboBox.FormattingEnabled = true;
+            intervalComboBox.Location = new System.Drawing.Point(20, 137);
+            intervalComboBox.Margin = new Padding(5, 6, 5, 6);
+            intervalComboBox.Name = "intervalComboBox";
+            intervalComboBox.Size = new System.Drawing.Size(206, 40);
+            intervalComboBox.TabIndex = 3;
+            intervalComboBox.SelectedIndexChanged += IntervalComboBoxSelectedIndexChanged;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 77);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(135, 25);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Change picture every";
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(20, 99);
+            label2.Margin = new Padding(5, 0, 5, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(153, 32);
+            label2.TabIndex = 4;
+            label2.Text = "Time interval";
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(101, 25);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Current folder:";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(20, 12);
+            label1.Margin = new Padding(5, 0, 5, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(212, 32);
+            label1.TabIndex = 5;
+            label1.Text = "Current Wallpaper:";
             // 
-            // wallpaperFolderLabel
+            // currentWallpaperLabel
             // 
-            this.wallpaperFolderLabel.AutoSize = true;
-            this.wallpaperFolderLabel.Location = new System.Drawing.Point(105, 9);
-            this.wallpaperFolderLabel.Name = "wallpaperFolderLabel";
-            this.wallpaperFolderLabel.Size = new System.Drawing.Size(52, 25);
-            this.wallpaperFolderLabel.TabIndex = 6;
-            this.wallpaperFolderLabel.Text = "not set";
+            currentWallpaperLabel.AutoSize = true;
+            currentWallpaperLabel.Location = new System.Drawing.Point(242, 12);
+            currentWallpaperLabel.Margin = new Padding(5, 0, 5, 0);
+            currentWallpaperLabel.Name = "currentWallpaperLabel";
+            currentWallpaperLabel.Size = new System.Drawing.Size(88, 32);
+            currentWallpaperLabel.TabIndex = 6;
+            currentWallpaperLabel.Text = "not set";
             // 
             // unregisterButton
             // 
-            this.unregisterButton.Location = new System.Drawing.Point(12, 150);
-            this.unregisterButton.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.unregisterButton.Name = "unregisterButton";
-            this.unregisterButton.Size = new System.Drawing.Size(128, 38);
-            this.unregisterButton.TabIndex = 7;
-            this.unregisterButton.Text = "Disable WalMan";
-            this.unregisterButton.UseVisualStyleBackColor = true;
-            this.unregisterButton.Click += new System.EventHandler(this.UnregisterButtonClick);
+            unregisterButton.Location = new System.Drawing.Point(20, 192);
+            unregisterButton.Margin = new Padding(5, 6, 5, 6);
+            unregisterButton.Name = "unregisterButton";
+            unregisterButton.Size = new System.Drawing.Size(208, 49);
+            unregisterButton.TabIndex = 7;
+            unregisterButton.Text = "Disable WalMan";
+            unregisterButton.UseVisualStyleBackColor = true;
+            unregisterButton.Click += UnregisterButtonClick;
             // 
             // skipListBox
             // 
-            this.skipListBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.skipListBox.FormattingEnabled = true;
-            this.skipListBox.IntegralHeight = false;
-            this.skipListBox.ItemHeight = 25;
-            this.skipListBox.Location = new System.Drawing.Point(146, 67);
-            this.skipListBox.Name = "skipListBox";
-            this.skipListBox.Size = new System.Drawing.Size(324, 374);
-            this.skipListBox.TabIndex = 8;
+            skipListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            skipListBox.FormattingEnabled = true;
+            skipListBox.IntegralHeight = false;
+            skipListBox.ItemHeight = 32;
+            skipListBox.Location = new System.Drawing.Point(237, 86);
+            skipListBox.Margin = new Padding(5, 4, 5, 4);
+            skipListBox.Name = "skipListBox";
+            skipListBox.Size = new System.Drawing.Size(524, 478);
+            skipListBox.TabIndex = 8;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(146, 39);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(64, 25);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Skip list:";
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(237, 50);
+            label3.Margin = new Padding(5, 0, 5, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(101, 32);
+            label3.TabIndex = 9;
+            label3.Text = "Skip list:";
             // 
             // openLogButton
             // 
-            this.openLogButton.Location = new System.Drawing.Point(12, 198);
-            this.openLogButton.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.openLogButton.Name = "openLogButton";
-            this.openLogButton.Size = new System.Drawing.Size(128, 38);
-            this.openLogButton.TabIndex = 10;
-            this.openLogButton.Text = "Open Log";
-            this.openLogButton.UseVisualStyleBackColor = true;
-            this.openLogButton.Click += new System.EventHandler(this.OpenLogButtonClick);
+            openLogButton.Location = new System.Drawing.Point(20, 253);
+            openLogButton.Margin = new Padding(5, 6, 5, 6);
+            openLogButton.Name = "openLogButton";
+            openLogButton.Size = new System.Drawing.Size(208, 49);
+            openLogButton.TabIndex = 10;
+            openLogButton.Text = "Open Log";
+            openLogButton.UseVisualStyleBackColor = true;
+            openLogButton.Click += OpenLogButtonClick;
+            // 
+            // openFileDialog
+            // 
+            openFileDialog.FileName = "openFileDialog";
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(482, 453);
-            this.Controls.Add(this.openLogButton);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.skipListBox);
-            this.Controls.Add(this.unregisterButton);
-            this.Controls.Add(this.wallpaperFolderLabel);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.intervalComboBox);
-            this.Controls.Add(this.selectFolderButton);
-            this.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(500, 500);
-            this.Name = "MainForm";
-            this.Text = "WalMan";
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(783, 580);
+            Controls.Add(openLogButton);
+            Controls.Add(label3);
+            Controls.Add(skipListBox);
+            Controls.Add(unregisterButton);
+            Controls.Add(currentWallpaperLabel);
+            Controls.Add(label1);
+            Controls.Add(label2);
+            Controls.Add(intervalComboBox);
+            Controls.Add(selectWallpaperButton);
+            Margin = new Padding(5, 6, 5, 6);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            MinimumSize = new System.Drawing.Size(796, 620);
+            Name = "MainForm";
+            Text = "WalMan";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
-        private System.Windows.Forms.Button selectFolderButton;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+        private System.Windows.Forms.Button selectWallpaperButton;
         private System.Windows.Forms.ComboBox intervalComboBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label wallpaperFolderLabel;
+        private System.Windows.Forms.Label currentWallpaperLabel;
         private System.Windows.Forms.Button unregisterButton;
         private ListBox skipListBox;
         private Label label3;
         private Button openLogButton;
+        private OpenFileDialog openFileDialog;
     }
 }
 

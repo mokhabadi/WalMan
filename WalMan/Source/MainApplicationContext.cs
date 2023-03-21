@@ -9,63 +9,39 @@ namespace WalMan
 {
     internal class MainApplicationContext : ApplicationContext
     {
-        readonly NotifyIcon notifyIcon;
+        static readonly NotifyIcon notifyIcon;
         readonly Manager manager;
+
+        static MainApplicationContext()
+        {
+            notifyIcon = new NotifyIcon()
+            {
+                Icon = Resources.WalMan,
+                Visible = true,
+                Text = "Disable",
+            };
+        }
 
         public MainApplicationContext()
         {
             Log.Add(@"//////////////// Application Run \\\\\\\\\\\\\\\\");
-            List<ToolStripItem> toolStripItems = new();
             manager = new();
-
-            foreach (Command command in manager.commands)
-                toolStripItems.Add(new ToolStripMenuItem(command.Description, null, (sender, eventArgs) => command.Action()));
-
-            toolStripItems.Add(new ToolStripSeparator());
-            toolStripItems.Add(new ToolStripMenuItem("Open", null, (sender, eventArgs) => manager.Open()));
-            toolStripItems.Add(new ToolStripMenuItem("Exit", null, (sender, eventArgs) => Application.Exit()));
-            ContextMenuStrip contextMenuStrip = new();
-            contextMenuStrip.Items.AddRange(toolStripItems.ToArray());
-
-            notifyIcon = new NotifyIcon()
-            {
-                Icon = Resources.WalMan,
-                ContextMenuStrip = contextMenuStrip,
-                Visible = true,
-                Text = "Disable",
-            };
-
             notifyIcon.MouseMove += NotifyIconMouseMove;
             notifyIcon.MouseUp += NotifyIconMouseUp;
             Application.ApplicationExit += (sender, eventArgs) => notifyIcon.Visible = false;
             manager.Initialize();
         }
 
-        void CreateMenu(Command[] commands)
+        public static void CreateMenu(Command[] commands)
         {
             List<ToolStripItem> toolStripItems = new();
 
-            foreach (Command command in manager.commands)
-                toolStripItems.Add(new ToolStripMenuItem(command.Description, null, (sender, eventArgs) => command.Action()));
+            foreach (Command command in commands)
+                toolStripItems.Add(new ToolStripMenuItem(command.Name, null, (sender, eventArgs) => command.Action()));
 
-            toolStripItems.Add(new ToolStripSeparator());
-            toolStripItems.Add(new ToolStripMenuItem("Open", null, (sender, eventArgs) => manager.Open()));
-            toolStripItems.Add(new ToolStripMenuItem("Exit", null, (sender, eventArgs) => Application.Exit()));
             ContextMenuStrip contextMenuStrip = new();
             contextMenuStrip.Items.AddRange(toolStripItems.ToArray());
-
-            notifyIcon = new NotifyIcon()
-            {
-                Icon = Resources.WalMan,
-                ContextMenuStrip = contextMenuStrip,
-                Visible = true,
-                Text = "Disable",
-            };
-
-            notifyIcon.MouseMove += NotifyIconMouseMove;
-            notifyIcon.MouseUp += NotifyIconMouseUp;
-            Application.ApplicationExit += (sender, eventArgs) => notifyIcon.Visible = false;
-            manager.Initialize();
+            notifyIcon.ContextMenuStrip = contextMenuStrip;
         }
 
         async void NotifyIconMouseMove(object? sender, EventArgs e)
