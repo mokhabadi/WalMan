@@ -35,7 +35,7 @@ namespace WalMan
             label2 = new Label();
             label1 = new Label();
             currentWallpaperLabel = new Label();
-            unregisterButton = new Button();
+            disableButton = new Button();
             skipListBox = new ListBox();
             label3 = new Label();
             openLogButton = new Button();
@@ -51,7 +51,7 @@ namespace WalMan
             selectWallpaperButton.TabIndex = 1;
             selectWallpaperButton.Text = "Select Wallpaper";
             selectWallpaperButton.UseVisualStyleBackColor = true;
-            selectWallpaperButton.Click += SelectFolderButtonClick;
+            selectWallpaperButton.Click += SelectWallpaperButtonClick;
             // 
             // intervalComboBox
             // 
@@ -94,16 +94,16 @@ namespace WalMan
             currentWallpaperLabel.TabIndex = 6;
             currentWallpaperLabel.Text = "not set";
             // 
-            // unregisterButton
+            // disableButton
             // 
-            unregisterButton.Location = new System.Drawing.Point(20, 192);
-            unregisterButton.Margin = new Padding(5, 6, 5, 6);
-            unregisterButton.Name = "unregisterButton";
-            unregisterButton.Size = new System.Drawing.Size(208, 49);
-            unregisterButton.TabIndex = 7;
-            unregisterButton.Text = "Disable WalMan";
-            unregisterButton.UseVisualStyleBackColor = true;
-            unregisterButton.Click += UnregisterButtonClick;
+            disableButton.Location = new System.Drawing.Point(20, 192);
+            disableButton.Margin = new Padding(5, 6, 5, 6);
+            disableButton.Name = "disableButton";
+            disableButton.Size = new System.Drawing.Size(208, 49);
+            disableButton.TabIndex = 7;
+            disableButton.Text = "Disable WalMan";
+            disableButton.UseVisualStyleBackColor = true;
+            disableButton.Click += UnregisterButtonClick;
             // 
             // skipListBox
             // 
@@ -114,7 +114,7 @@ namespace WalMan
             skipListBox.Location = new System.Drawing.Point(237, 86);
             skipListBox.Margin = new Padding(5, 4, 5, 4);
             skipListBox.Name = "skipListBox";
-            skipListBox.Size = new System.Drawing.Size(524, 478);
+            skipListBox.Size = new System.Drawing.Size(380, 358);
             skipListBox.TabIndex = 8;
             // 
             // label3
@@ -150,7 +150,7 @@ namespace WalMan
             Controls.Add(openLogButton);
             Controls.Add(label3);
             Controls.Add(skipListBox);
-            Controls.Add(unregisterButton);
+            Controls.Add(disableButton);
             Controls.Add(currentWallpaperLabel);
             Controls.Add(label1);
             Controls.Add(label2);
@@ -173,7 +173,7 @@ namespace WalMan
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label currentWallpaperLabel;
-        private System.Windows.Forms.Button unregisterButton;
+        private System.Windows.Forms.Button disableButton;
         private ListBox skipListBox;
         private Label label3;
         private Button openLogButton;

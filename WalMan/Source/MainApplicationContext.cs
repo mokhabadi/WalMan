@@ -47,7 +47,8 @@ namespace WalMan
         async void NotifyIconMouseMove(object? sender, EventArgs e)
         {
             notifyIcon.MouseMove -= NotifyIconMouseMove;
-            notifyIcon.Text = manager.GetRemainingTime();
+            int remainingTime = manager.GetRemainingTime();
+            notifyIcon.Text = remainingTime > 0 ? Statics.SecondToString(remainingTime) : "Disabled";
             await Task.Delay(1000);
             notifyIcon.MouseMove += NotifyIconMouseMove;
         }

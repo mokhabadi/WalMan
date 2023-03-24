@@ -5,6 +5,7 @@ namespace WalMan
 {
     public class Command
     {
+        public string Id => Action.Method.Name;
         public string Name { get; private set; }
         public Func<Task> Action { get; private set; }
 

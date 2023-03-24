@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Text.Json.Serialization;
 
 namespace WalMan
 {
     internal class UserData
     {
-        public int Interval { get; private set; }
-        public int RemainingTime { get; private set; }
-        public string? CurrentWallpaper { get; private set; }
-
-        readonly List<string> skips;
-
-        public string[] Skips => skips.ToArray();
+        [JsonInclude] public int Interval { get; private set; }
+        [JsonInclude] public int RemainingTime { get; private set; }
+        [JsonInclude] public string? Wallpaper { get; private set; }
+        [JsonInclude] public List<string> SkipList { get; private set; }
 
         public event Action? DateChange;
-        public event Action? CurrentWallpaperChange;
+        public event Action? WallpaperChange;
 
         public UserData()
         {
+            SkipList = new();
         }
 
         public void SetInterval(int interval)
@@ -33,34 +31,33 @@ namespace WalMan
             DateChange?.Invoke();
         }
 
-        public void SetCurrentWallpaper(string? currentWallpaper)
+        public void SetWallpaper(string? wallpaper)
         {
-            CurrentWallpaper = currentWallpaper;
-            CurrentWallpaperChange?.Invoke();
+            Wallpaper = wallpaper;
+            WallpaperChange?.Invoke();
             DateChange?.Invoke();
         }
 
         public void AddSkip()
         {
-            string fileName = Path.GetFileName(CurrentWallpaper)!;
-            skips.Add(fileName);
+            SkipList.Add(Wallpaper);
             DateChange?.Invoke();
         }
 
         public void RemoveSkip(string skip)
         {
-            skips.Remove(skip);
+            SkipList.Remove(skip);
             DateChange?.Invoke();
         }
 
         public bool SkipsContain(string fileName)
         {
-            return skips.Contains(fileName);
+            return SkipList.Contains(fileName);
         }
 
         public void Reset()
         {
-            CurrentWallpaper = null;
+            Wallpaper = null;
             RemainingTime = 0;
         }
     }

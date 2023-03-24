@@ -1,31 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace WalMan
 {
-    public class Map<TKey, TValue> : IEnumerable
+    public class Map<TKey, TValue>
     {
         (TKey key, TValue value)[] KeyValues = Array.Empty<(TKey key, TValue value)>();
-
-        public IEnumerator GetEnumerator() => KeyValues.GetEnumerator();
-
-        public void Add(TKey key, TValue value)
-        {
-            Add((key, value));
-        }
-
-        public void Add((TKey key, TValue value) keyValue)
-        {
-            if (keyValue.key == null)
-                throw new NullReferenceException("Key is null.");
-
-            if (HasKey(keyValue.key))
-                throw new ArgumentException("Key already exists.");
-
-            Array.Resize(ref KeyValues, KeyValues.Length + 1);
-            KeyValues[^1] = keyValue;
-        }
 
         public TValue this[TKey key]
         {
@@ -37,6 +17,18 @@ namespace WalMan
 
                 throw new KeyNotFoundException();
             }
+
+            set
+            {
+                if (key == null)
+                    throw new NullReferenceException("Key is null.");
+
+                if (HasKey(key))
+                    throw new ArgumentException("Key already exists.");
+
+                Array.Resize(ref KeyValues, KeyValues.Length + 1);
+                KeyValues[^1] = (key, value);
+            }
         }
 
         public bool HasKey(TKey key)
@@ -46,6 +38,19 @@ namespace WalMan
                     return true;
 
             return false;
+        }
+
+        public void Clear()
+        {
+            KeyValues = Array.Empty<(TKey key, TValue value)>();
+        }
+
+        public void Fill(TValue[] values, Func<TValue, TKey> KeyGetter)
+        {
+            Clear();
+
+            foreach(TValue value in values)
+                this[KeyGetter(value)] = value;
         }
     }
 }

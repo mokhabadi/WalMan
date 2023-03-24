@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace WalMan
 {
@@ -34,7 +33,7 @@ namespace WalMan
             {Style.Tile, (0,1)},
         };
 
-        public static async Task Set(string filePath, Style style)
+        public static void Set(string filePath, Style style)
         {
             RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
 
@@ -43,7 +42,7 @@ namespace WalMan
 
             key.SetValue("WallpaperStyle", styles[style].Style.ToString());
             key.SetValue("TileWallpaper", styles[style].Tile.ToString());
-            int result = await Task.Run(() => SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, filePath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE));
+            int result = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, filePath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
             Log.Add("Wallpaper Set " + (result > 0 ? "Successfully" : "failed"));
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace WalMan
 {
@@ -32,5 +33,12 @@ namespace WalMan
             return Regex.Replace(str, "[a-z][A-Z]", m => $"{m.Value[0]} {char.ToLower(m.Value[1])}");
         }
 
+        public static void OpenFile(string fileName)
+        {
+            ProcessStartInfo processStartInfo = new();
+            processStartInfo.FileName = fileName;
+            processStartInfo.UseShellExecute = true;
+            Process.Start(processStartInfo);
+        }
     }
 }

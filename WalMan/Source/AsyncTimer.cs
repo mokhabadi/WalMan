@@ -63,7 +63,7 @@ namespace WalMan
             {
                 await Task.Delay(TimeSpan.FromSeconds(interval), cancellationTokenSource.Token);
             }
-            catch (Exception exception)
+            catch (TaskCanceledException exception)
             {
                 Log.Add($"AsyncTimer Exception: {exception.Message}");
                 cancellationTokenSource?.Dispose();
